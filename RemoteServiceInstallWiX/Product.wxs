@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <?if $(var.Development) = true?>
+    <?define installationType="Development" ?>
+  <?else ?>
+    <?define installationType="" ?>
+  <?endif ?>
+  
+	<Product Id="D57D8A24-1DD2-41FC-9DAA-4100CEADE80E" Name="Lumenis Remote Service $(var.installationType) v2.0.6" Language="1033" Version="2.0.6" Manufacturer="Lumenis Ltd."
+           UpgradeCode="02E714BA-392F-43D1-B585-315455582A90">
+
+    <Package Id="*" Description="Lumenis Remote Service Installer" InstallerVersion="200" Compressed="yes" />
+    <Media Id="1" Cabinet="RemoteService.cab" EmbedCab="yes" />
+
+    <Property Id="ROOTDRIVE">
+      <![CDATA[D:\]]>
+    </Property>
+    <Property Id="WIXUI_INSTALLDIR" Value="INSTALLLOCATION" />
+    <!--<Property Id="BOMGAR_INSTALLED" Value="0"/>-->
+    
+    <!-- Define components and their locations-->
+    <Directory Id="TARGETDIR" Name="SourceDir">
+			<Directory Id="ProgramFiles" Name="Program Files">
+        <Directory Id="Lumenis" Name="Lumenis">
+          <Directory Id="INSTALLLOCATION" Name="Remote Service">
+					  <Component Id="ServiceComponent" Guid="7CB1DE56-B5D5-4E8B-9C8E-4998084CD08B">
+              <?ifdef Debug ?>
+                <File Id='RemoteService' Name='RemoteService.exe' DiskId='1' Source='..\RemoteService\bin\Debug\RemoteService.exe' KeyPath='yes'/>
+                <File Id='RemoteServiceConfig' Name='RemoteService.exe.config' DiskId='1' Source='..\RemoteService\bin\Debug\RemoteService.exe.config'/>
+              <?else?>
+                <File Id='RemoteService' Name='RemoteService.exe' DiskId='1' Source='..\RemoteService\bin\Release\RemoteService.exe' KeyPath='yes'/>
+                <File Id='RemoteServiceConfig' Name='RemoteService.exe.config' DiskId='1' Source='..\RemoteService\bin\Release\RemoteService.exe.config'/>
+              <?endif?>
+              <File Id='WinSCP' Name='WinSCP.dll' DiskId='1' Source='..\ThirdPartyFiles\WinSCP.dll'/>
+
+              <!--return to code-->
+              <ServiceInstall Id='RemoteServiceInstall' DisplayName='Lumenis Remote Service' Name='RemoteService' Description='Controlling remote connectivity with Lumenis device' ErrorControl='normal' Start='auto' Type='ownProcess' Vital='yes' />
+              <ServiceControl Id='RemoteServiceControl' Name='RemoteService' Start='install' Stop='uninstall' Remove='uninstall' />
+            </Component>
+            
+            <!--<Component Id='BomgarJumpClientComp' Guid='EDA4EC3F-CF0A-4849-980F-038E414F0E59'>-->
+              <!--The Development is defined as Define Preprocessor Variables in the RemoteServiceInstallWiX file -->
+              <!--<?if $(var.Development) = true ?>
+                <File Id='BomgarJumpClient' Name='bomgar-scc-w0idc30d881fdg6wdej5eegf81g7xwh5781xgjhc40jc90.exe' Source='..\ThirdPartyFiles\Development\bomgar-scc-w0idc30d881fdg6wdej5eegf81g7xwh5781xgjhc40jc90.exe' Vital='no' />
+              <?else ?>-->
+              <!--(var.Development) = false - for production-->
+                <!--<File Id='BomgarJumpClient' Name='bomgar-scc-w0idc30d881fdg6wdej5eegf81g7xwh5781xgjhc40jc90.exe' Source='..\ThirdPartyFiles\Production\bomgar-scc-w0idc30d881fdg6wdej5eegf81g7xwh5781xgjhc40jc90.exe' Vital='no' />
+              <?endif ?>
+            </Component>-->
+            
+            <Component Id='RemoteServiceAPIComponent' Guid='C5C61B35-DD44-4FAD-82D5-F2084FF37B99'>
+              <?ifdef Debug ?>
+                <File Id='RemoteServiceApiGAC' Name='RemoteServiceApi.dll' Assembly='.net' KeyPath='yes' DiskId='1' Source='..\RemoteServiceClient\bin\Debug\RemoteServiceApi.dll'/>
+              <?else?>
+                <File Id='RemoteServiceApiGAC' Name='RemoteServiceApi.dll' Assembly='.net' KeyPath='yes' DiskId='1' Source='..\RemoteServiceClient\bin\Release\RemoteServiceApi.dll'/>
+              <?endif?>
+            </Component>
+
+          </Directory>
+        </Directory>
+			</Directory>
+		</Directory>
+
+    <Feature Id="MyFeatures" Level="1" ConfigurableDirectory='INSTALLLOCATION' Display='expand' AllowAdvertise='no'>
+      <!-- Default feature -->
+      <Feature Id="ProductFeature" AllowAdvertise='no' Display='expand' Level='1' ConfigurableDirectory='INSTALLLOCATION' >
+        <ComponentRef Id="ServiceComponent" />
+        <ComponentRef Id="RemoteServiceAPIComponent"/>
+      </Feature>
+        
+      <!-- Non-default feature -->
+      <!--<Feature Id="BomgarJumpClientFeature" AllowAdvertise='no' Display='expand' Level='0' ConfigurableDirectory='INSTALLLOCATION'>
+        <ComponentRef Id="BomgarJumpClientComp" />
+        <Condition Level="1">BOMGAR_INSTALLED="0"</Condition>
+      </Feature>-->
+    </Feature>
+
+    <!-- Define custom actions and corresponding custom action DLLs when required -->
+    <?ifdef Debug ?>
+      <Binary Id='WixCustom'  SourceFile='..\RemoteServiceInstallWixCustom\bin\Debug\RemoteServiceInstallWixCustom.CA.dll' />
+    <?else?>
+      <Binary Id='WixCustom'  SourceFile='..\RemoteServiceInstallWixCustom\bin\Release\RemoteServiceInstallWixCustom.CA.dll' />
+    <?endif?>
+
+    <CustomAction Id='CheckPrereq' BinaryKey='WixCustom' DllEntry='CheckPrerequisites' />
+    <CustomAction Id='ChangeComputerName' BinaryKey='WixCustom' DllEntry='ChangeComputerName' />
+    <CustomAction Id='WcfCommit' BinaryKey='WixCustom' DllEntry='WcfCommit' />
+    <!--<CustomAction Id='LaunchJumpClientInstall' FileKey='BomgarJumpClient' ExeCommand='' Return='check' />-->
+
+    <!-- Applying custom actions during installation -->
+    <InstallExecuteSequence>
+      <Custom Action='ChangeComputerName' After='StartServices'></Custom>
+      <!--<Custom Action='LaunchJumpClientInstall' After='InstallFinalize'>($BomgarJumpClientComp=3)</Custom>-->
+      <!--<Custom Action='WcfCommit' After='LaunchJumpClientInstall'>($BomgarJumpClientComp=3)</Custom>-->
+    </InstallExecuteSequence>
+
+    <!-- Define custom properties -->
+    <Property Id="HASP_INSERTED">0</Property>
+    <!--<Property Id="CONNECTION_OK">0</Property>-->
+    <Property Id="IMAGE_VERSION_OK">0</Property>
+    <Property Id="IMAGE_VERSION"><![CDATA["Not"]]></Property>
+    <Property Id="COMPUTER_NAME">LUMENISW10</Property>
+    <Property Id="PREREQ_FINISHED">0</Property>
+
+    <!-- Define GUI changes -->
+     <UI Id="MyWixUI_InstallDir">
+      <UIRef Id="WixUI_InstallDir" />
+      <UIRef Id="WixUI_ErrorProgressText" />
+
+      <DialogRef Id="CheckPrerequisitesDlg" />
+
+      <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="CheckPrerequisitesDlg">1</Publish>
+      <Publish Dialog="WelcomeDlg" Control="Next" Event="DoAction" Value="CheckPrereq">1</Publish>
+      <Publish Dialog="InstallDirDlg" Control="Back" Event="NewDialog" Value="CheckPrerequisitesDlg">1</Publish>
+    </UI>
+    
+  </Product>
+</Wix>

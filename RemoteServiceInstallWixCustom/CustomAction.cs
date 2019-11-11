@@ -1,0 +1,658 @@
+﻿using System;
+using System.Text;
+using Microsoft.Deployment.WindowsInstaller;
+using System.Net;
+using Lumenis.LicenseApi;
+using Microsoft.Win32;
+using System.Runtime.InteropServices;
+using System.IO;
+using System.Windows.Forms;
+using System.Threading;
+using System.Management;
+using System.Diagnostics;
+using System.Reflection;
+
+namespace RemoteServiceInstallWixCustom
+{
+    public class CustomActions
+    {
+        private const string VOLUME = @"\\?\GLOBALROOT\Device\HarddiskVolume1";
+        const string INSTALL_DIR = @"D:\Program Files\Lumenis\";
+        const string TEMP_APP_DIR = "LSI.tmp";
+        
+        [CustomAction]
+        public static ActionResult CheckPrerequisites(Session session)
+        {
+            session.Log("Begin CheckPrerequisites");
+            LogRecord("Begin CheckPrerequisites", session);
+            
+            if (UwfApi.IsUwfEnabled())
+            {
+                session.Log("Disabling UWF...");
+                TurnUWFOff();
+                return ActionResult.SkipRemainingActions;
+            }
+
+            // THIS VERSION DOES NOT INCLUDE BOMGAR SO IT IS CLOSED
+            //if (IsBomgarInstalled())
+            //{
+            //    session["BOMGAR_INSTALLED"] = "1";
+            //    session["CONNECTION_OK"] = "2";
+            //}
+            //else
+            //{
+            //    session["BOMGAR_INSTALLED"] = "0";
+            //    session["CONNECTION_OK"] = ConnectionAvailable("https://support.lumenis.com") ? "1" : "0";
+            //}
+
+            if (CheckHasp())
+            {
+                session["HASP_INSERTED"] = "1";
+                session["COMPUTER_NAME"] = BuildComputerName();
+            }
+            else
+            {
+                session["HASP_INSERTED"] = "0";
+                session["COMPUTER_NAME"] = "";
+            }
+
+            string version;
+            string versionCheck;
+            CheckImageVersion(out version, out versionCheck);
+            session["IMAGE_VERSION"] = version;
+            session["IMAGE_VERSION_OK"] = versionCheck;
+            session["PREREQ_FINISHED"] = "1";
+
+            return ActionResult.Success;
+        }
+
+        internal static void TurnUWFOff()
+        {
+            UwfApi.DisableUWF();
+            
+            WaitForm waitForm = new WaitForm();
+            waitForm.Show();
+            Application.DoEvents();
+
+            for (int i = 0, j = 5; i <= 5; i++, j--)
+            {
+                Thread.Sleep(1000);
+
+                if (i == 1)
+                {
+                    waitForm.ShowCountdownInfo();
+                }
+
+                if (i > 1)
+                {
+                    waitForm.Countdown(j);
+                }
+
+                Application.DoEvents();
+            }
+            
+            System.Diagnostics.Process.Start("shutdown.exe", "-r -t 0");
+        }
+
+        private static void RunApplicationOnceTime()
+        { 
+            string key = @"SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce";
+
+            using (RegistryKey subkey = Registry.LocalMachine.OpenSubKey(key, true))
+            {
+                string fullName = Assembly.GetEntryAssembly().Location;
+                subkey.SetValue("RemoteServiceInstallation", fullName);
+            }
+        }
+
+        [CustomAction]
+        public static ActionResult ChangeComputerName(Session session)
+        {
+            string currentComputerName = Environment.GetEnvironmentVariable("COMPUTER_NAME");
+            string newComputerName = session["COMPUTER_NAME"];
+            if (string.IsNullOrEmpty(currentComputerName) ||
+                currentComputerName.ToLower() != newComputerName.ToLower())
+            {
+                if (WinApi.SetComputerNameEx(WinApi.COMPUTER_NAME_FORMAT.ComputerNamePhysicalDnsHostname, newComputerName))
+                {
+                    return ActionResult.Success;
+                }
+                else
+                {
+                    return ActionResult.Failure;
+                }
+            }
+            return ActionResult.Failure;
+        }
+
+        [CustomAction]
+        public static ActionResult WcfCommit(Session session)
+        {
+            // EwfApi.DoEwfCommit(@"\\?\GLOBALROOT\Device\HarddiskVolume1");
+            //return ActionResult.Success;
+
+            // UwfApi.UWF_CommitFile(@"C:\");
+            // return ActionResult.Success;
+            return ActionResult.NotExecuted;
+        }
+
+        // THIS VERSION DOES NOT INCLUDE BOMGAR SO IT IS CLOSED
+        //[CustomAction]
+        //public static ActionResult PrintSession(Session session)
+        //{
+        //    string bomgar = session["BOMGAR_INSTALLED"];
+        //    MessageBox.Show(bomgar);
+        //    return ActionResult.Success;
+        //}
+        
+        private static void LogRecord(string message, Session session, InstallMessage installMessage = InstallMessage.Info)
+        {
+            session.Message(installMessage, new Record() { FormatString = message });
+        }
+
+        // THIS VERSION DOES NOT INCLUDE BOMGAR SO IT IS CLOSED
+        //private static bool ConnectionAvailable(string strServer)
+        //{
+        //    try
+        //    {
+        //        HttpWebRequest reqFP = (HttpWebRequest)HttpWebRequest.Create(strServer);
+ 
+        //        HttpWebResponse rspFP = (HttpWebResponse)reqFP.GetResponse();
+        //        if (HttpStatusCode.OK == rspFP.StatusCode)
+        //        {
+        //            // HTTP = 200 - Internet connection available, server online
+        //            rspFP.Close();
+        //            return true;
+        //        }
+        //        else
+        //        {
+        //            // Other status - Server or connection not available
+        //            rspFP.Close();
+        //            return false;
+        //        }
+        //    }
+        //    catch (WebException)
+        //    {
+        //        // Exception - connection not available
+        //        return false;
+        //    }
+        //}
+
+        private static bool CheckHasp()
+        {
+            try
+            {
+                SecurityKey securityKey = new SecurityKey();
+                if (!securityKey.UseFeature(SecurityKey.MAIN_FEATURE_ID))
+                {
+                    return false;
+                }
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        private static string BuildComputerName()
+        {
+            try
+            {
+                StringBuilder computerName = new StringBuilder(40);
+                computerName.Append(SecurityKey.PartNumber).Append(SecurityKey.SerialNumber);
+                string partNumber = SecurityKey.PartNumber.TrimEnd(new char[] { '\0' });
+                string serialNumber = SecurityKey.SerialNumber.TrimEnd(new char[] { '\0' });
+                return serialNumber + "_" + partNumber;
+            }
+            catch
+            {
+                return "";
+            }
+        }
+
+        private static void CheckImageVersion(out string version, out string versionCheck)
+        {
+            // versionCheck = "0";
+            versionCheck = "1"; // Ignore version check on Windows 10
+
+            try
+            {
+                object ver = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64).
+                    OpenSubKey("SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion").GetValue("ImageVersion");
+                
+                if (ver == null)
+                {
+                    version = "Not set";
+                    return;
+                }
+                else
+                {
+                    version = ver.ToString();
+                }
+
+                //if (version.Length < 6)
+                //{
+                //    version = "Incompatible version";
+                //}
+                //else if (version.Substring(6).CompareTo("1.5") < 0)
+                //{
+                //    return;
+                //}
+                //versionCheck = "1";
+            }
+            catch
+            {
+                version = "Not set";
+            }
+        }
+
+        // THIS VERSION DOES NOT INCLUDE BOMGAR SO IT IS CLOSED
+        //private static bool IsBomgarInstalled()
+        //{
+        //    bool result = false;
+        //    try
+        //    {
+        //        string[] dirs = Directory.GetDirectories(@"C:\ProgramData", @"bomgar*");
+
+        //        if (dirs.Length > 0)
+        //        {
+        //            result = true;
+        //        }
+        //    }
+        //    catch (Exception)
+        //    {
+        //        result = false;
+        //    }
+
+        //    return result;
+        //}
+    }
+
+    internal static class WinApi
+    {
+        public enum COMPUTER_NAME_FORMAT
+        {
+            ComputerNameNetBIOS,
+            ComputerNameDnsHostname,
+            ComputerNameDnsDomain,
+            ComputerNameDnsFullyQualified,
+            ComputerNamePhysicalNetBIOS,
+            ComputerNamePhysicalDnsHostname,
+            ComputerNamePhysicalDnsDomain,
+            ComputerNamePhysicalDnsFullyQualified,
+        }
+
+        [DllImport("kernel32.dll", CharSet = CharSet.Auto)]
+        public static extern bool SetComputerNameEx(COMPUTER_NAME_FORMAT NameType, string lpBuffer);
+
+        [DllImport("kernel32.dll", CharSet = CharSet.Auto)]
+        public static extern uint GetLastError();
+    }
+
+    internal static class EwfApi
+    {
+        internal enum EWF_CMD
+        {
+            EWF_NO_CMD = 0,
+            EWF_ENABLE,
+            EWF_DISABLE,
+            EWF_SET_LEVEL,
+            EWF_COMMIT
+        }
+
+        internal enum EWF_STATE
+        {
+            EWF_ENABLED,
+            EWF_DISABLED
+        }
+
+        internal enum EWF_TYPE
+        {
+            EWF_DISK,
+            EWF_RAM,
+            EWF_RAM_REG,
+        }
+
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+        internal struct EWF_VOLUME_DESC
+        {
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 256)]
+            internal string DeviceName;
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 16)]
+            internal byte[] VolumeID;
+        }
+        
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+        internal struct EWF_VOLUME_CONFIG
+        {
+            internal EWF_TYPE Type;
+            internal EWF_STATE State;
+            internal EWF_CMD BootCommand;
+
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 32)]
+            internal byte[] PersistentData;
+            internal ushort MaxLevels;
+            internal uint ClumpSize;
+            internal ushort CurrentLevel;
+
+            internal long DiskMapSize;
+            internal long DiskDataSize;
+
+            internal long MemMapSize;
+            internal EWF_VOLUME_DESC VolumeDesc;
+            internal IntPtr LevelDescArray;
+        }
+
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+        internal struct EWF_VOLUME_NAME_ENTRY
+        {
+            public IntPtr Next;
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 256)]
+            public string Name;
+        }
+
+        // define externs for EWF manage functions
+        [DllImport("Ewfapi.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+        extern internal static IntPtr EwfMgrGetProtectedVolumeConfig(IntPtr hVolume);
+
+        [DllImport("Ewfapi.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+        extern internal static IntPtr EwfMgrOpenProtected(string volumeName);
+
+        [DllImport("Ewfapi.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+        extern internal static bool EwfMgrCommit(IntPtr hVolume);
+
+        [DllImport("Ewfapi.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+        extern internal static bool EwfMgrClose(IntPtr hVolume);
+
+        [DllImport("Ewfapi.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+        extern internal static IntPtr EwfMgrGetProtectedVolumeList();
+
+        [DllImport("Ewfapi.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+        extern internal static bool EwfMgrVolumeNameListIsEmpty(IntPtr volumeNameEntryPtr);
+
+        [DllImport("Ewfapi.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+        extern internal static void EwfMgrVolumeNameEntryPop(ref IntPtr volumeNameEntryPtr);
+
+        [DllImport("Kernel32.dll")]
+        extern internal static uint GetLastError();
+
+        internal static void DoEwfCommit(string volumeName)
+        {
+            IntPtr INVALID_HANDLE_VALUE = new IntPtr(-1);
+            IntPtr hVolume = INVALID_HANDLE_VALUE;
+
+            IntPtr volumeNameEntryPtr = EwfApi.EwfMgrGetProtectedVolumeList();
+            if (volumeNameEntryPtr == IntPtr.Zero)
+            {
+                //EventLog.WriteEntry(ServiceName, "EWF failed get volume name entry list", EventLogEntryType.Error);
+                return;
+            }
+
+            while (!EwfApi.EwfMgrVolumeNameListIsEmpty(volumeNameEntryPtr))
+            {
+                EwfApi.EWF_VOLUME_NAME_ENTRY volumeNameEntry =
+                    (EwfApi.EWF_VOLUME_NAME_ENTRY)Marshal.PtrToStructure(volumeNameEntryPtr, typeof(EwfApi.EWF_VOLUME_NAME_ENTRY));
+
+                // Use the volume name to open a handle to this protected volume.
+                hVolume = EwfApi.EwfMgrOpenProtected(volumeNameEntry.Name);
+                if (hVolume == INVALID_HANDLE_VALUE)
+                {
+                    //EventLog.WriteEntry(ServiceName, string.Format("EWF open protected failed, error: {0}", EwfApi.GetLastError()), EventLogEntryType.Error);
+                    return;
+                }
+
+                // if volume is opened perform commit
+                bool bResult = EwfApi.EwfMgrCommit(hVolume);
+                if (!bResult)
+                {
+                    //EventLog.WriteEntry(ServiceName, string.Format("EWF Commit failed, error: {0}", EwfApi.GetLastError()), EventLogEntryType.Error);
+                }
+                else
+                {
+                    //EventLog.WriteEntry(ServiceName, "EWF Commit succeeded", EventLogEntryType.Information);
+                }
+
+                EwfApi.EwfMgrClose(hVolume);
+
+                // get next volume entry
+                EwfApi.EwfMgrVolumeNameEntryPop(ref volumeNameEntryPtr);
+            }
+        }
+
+        internal static bool IsEnabled(string volumeName)
+        {
+            IntPtr INVALID_HANDLE_VALUE = new IntPtr(-1);
+            IntPtr hVolume = INVALID_HANDLE_VALUE;
+
+            IntPtr volumeNameEntryPtr = EwfApi.EwfMgrGetProtectedVolumeList();
+            if (volumeNameEntryPtr == IntPtr.Zero)
+            {
+                return false;
+            }
+
+            while (!EwfMgrVolumeNameListIsEmpty(volumeNameEntryPtr))
+            {
+                EWF_VOLUME_NAME_ENTRY volumeNameEntry =
+                    (EWF_VOLUME_NAME_ENTRY)Marshal.PtrToStructure(volumeNameEntryPtr, typeof(EWF_VOLUME_NAME_ENTRY));
+
+                // Use the volume name to open a handle to this protected volume.
+                hVolume = EwfMgrOpenProtected(volumeNameEntry.Name);
+                if (hVolume == INVALID_HANDLE_VALUE)
+                {
+                    return false;
+                }
+
+                IntPtr ewfVolumeConfigPtr = EwfMgrGetProtectedVolumeConfig(hVolume);
+                if (ewfVolumeConfigPtr == IntPtr.Zero)
+                {
+                    return false;
+                }
+
+                EWF_VOLUME_CONFIG ewfVolumeConfig =
+                    (EWF_VOLUME_CONFIG)Marshal.PtrToStructure(ewfVolumeConfigPtr, typeof(EWF_VOLUME_CONFIG));
+
+                // close volume
+                EwfMgrClose(hVolume);
+
+                return ewfVolumeConfig.State == EWF_STATE.EWF_ENABLED;
+            }
+            
+            return false;
+        }
+    }
+
+    internal static class UwfApi
+    {
+        #region Private Vars
+        private static EventLog applicationLog = new EventLog("Application");
+        
+        private static ManagementScope wmiScope = new ManagementScope(@"\\localhost\root\StandardCimv2\embedded")
+        {
+            Options = new ConnectionOptions
+            {
+                Impersonation = ImpersonationLevel.Impersonate,
+                Authentication = AuthenticationLevel.Default,
+                EnablePrivileges = true
+            }
+        };
+        #endregion
+
+        static UwfApi()
+        {
+            wmiScope.Connect();
+            applicationLog.Source = "Application";
+        }
+
+        internal static void DisableUWF()
+        {
+            try
+            {
+                if (wmiScope.IsConnected)
+                {
+                    using (ManagementClass mc = new ManagementClass(wmiScope.Path.Path, "UWF_Filter", null))
+                    {
+                        //next line failes with Access Denied under normal user account
+                        ManagementObjectCollection moc = mc.GetInstances();
+                        foreach (ManagementObject mo in moc)
+                        {
+                            uint hresult = (uint)mo.InvokeMethod("ResetSettings", null);
+                            if (hresult != 0)
+                            {
+                                throw new InvalidOperationException("UWF Disable failed.");
+                            }
+
+                            hresult = (uint)mo.InvokeMethod("Disable", null);
+                            if (hresult != 0)
+                            {
+                                throw new InvalidOperationException("UWF ResetSettings failed.");
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    throw new InvalidOperationException("WMI is disconnected.");
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        internal static bool IsVolumeProtected(string volume)
+        {
+            try
+            {
+                if (wmiScope.IsConnected)
+                {
+                    using (ManagementClass mc = new ManagementClass(wmiScope.Path.Path, "UWF_Volume", null))
+                    {
+                        //next line failes with Access Denied under normal user account
+                        ManagementObjectCollection moc = mc.GetInstances();
+                        foreach (ManagementObject mo in moc)
+                        {
+                            string DriveLetter = (string)mo.GetPropertyValue("DriveLetter");
+                            string VolumeName = (string)mo.GetPropertyValue("VolumeName");
+                            bool Protected = (bool)mo.GetPropertyValue("Protected");
+
+                            applicationLog.WriteEntry(string.Format("VolumeName: {0} , Protected: {1}", VolumeName, Protected), EventLogEntryType.Information);
+                            
+                            if (VolumeName.Equals(volume, StringComparison.OrdinalIgnoreCase))
+                            {
+                                return Protected;
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    throw new InvalidOperationException("WMI is disconnected.");
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            return false;
+        }
+
+        internal static bool UWF_CommitFile(string fileFullPath)
+        {
+            bool res = false;
+            
+            try
+            {
+                string driveLetter = Path.GetPathRoot(fileFullPath).Substring(0, 2);
+
+                if (string.IsNullOrWhiteSpace(driveLetter))
+                {
+                    return false;
+                }
+
+                if (wmiScope.IsConnected)
+                {
+                    using (ManagementClass mc = new ManagementClass(wmiScope.Path.Path, "UWF_Volume", null))
+                    {
+                        //next line failes with Access Denied under normal user account
+                        ManagementObjectCollection moc = mc.GetInstances();
+                        foreach (ManagementObject mo in moc)
+                        {
+                            string UWF_DriveLetter = (string)mo.GetPropertyValue("DriveLetter");
+                            
+                            if (UWF_DriveLetter.Equals(driveLetter, StringComparison.OrdinalIgnoreCase))
+                            {
+                                uint hresult = 0;
+
+                                if (Path.IsPathRooted(fileFullPath))
+                                {
+                                    hresult = (uint)mo.InvokeMethod("CommitFile", new object[] { fileFullPath.Substring(2) });
+                                }
+                                else
+                                {
+                                    hresult = (uint)mo.InvokeMethod("CommitFile", new object[] { fileFullPath });
+                                }
+                                
+                                if (hresult != 0)
+                                {
+                                    applicationLog.WriteEntry(string.Format("UWF CommitFile failed. File: {0} Error: {1}", fileFullPath, hresult), EventLogEntryType.Error);
+                                    res = false;
+                                }
+                                else
+                                {
+                                    applicationLog.WriteEntry(string.Format("CommitFile succeded. File: {0}", fileFullPath), EventLogEntryType.Information);
+                                    res = true;
+                                }
+                                break;
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    throw new InvalidOperationException("WMI is disconnected.");
+                }
+            }
+            catch (Exception ex)
+            {
+                applicationLog.WriteEntry(string.Format("UWF_CommitFile Error occured: {0} ", ex.Message), EventLogEntryType.Error);
+                throw ex;
+            }
+
+            return res;
+        }
+        
+        internal static bool IsUwfEnabled()
+        {
+            try
+            {
+                if (wmiScope.IsConnected)
+                {
+                    using (ManagementClass mc = new ManagementClass(wmiScope.Path.Path, "UWF_Filter", null))
+                    {
+                        //next line failes with Access Denied under normal user account
+                        ManagementObjectCollection moc = mc.GetInstances();
+                        foreach (ManagementObject mo in moc)
+                        {
+                            bool UWFstate = (bool)mo.GetPropertyValue("CurrentEnabled");
+                            return UWFstate;
+                        }
+                    }
+                }
+                else
+                {
+                    throw new InvalidOperationException("WMI is disconnected.");
+                }
+            }
+            catch (Exception ex)
+            {
+                // applicationLog.WriteEntry(string.Format("IsUwfEnabled error: {0}", ex.Message), EventLogEntryType.Error);
+                throw ex;
+            }
+
+            return false;
+        }
+    }
+}

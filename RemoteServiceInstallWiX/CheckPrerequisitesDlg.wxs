@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+	<Fragment>
+    <UI>
+      <TextStyle Id="WixUI_Font_Green" FaceName="Tahoma" Size="8" Red="0" Green="192" Blue="0" Bold="yes" />
+      <TextStyle Id="WixUI_Font_Red" FaceName="Tahoma" Size="8" Red="255" Green="0" Blue="0" Bold="yes" />
+
+      <Dialog Id="CheckPrerequisitesDlg" Width="370" Height="270" Title="[ProductName] Setup" NoMinimize="yes">
+        <Control Id="NameLabel" Type="Text" X="30" Y="73" Width="220" Height="15" TabSkip="no" Text="Installation prerequisites:" />
+        <Control Id="ImageLabel" Type="Text" X="45" Y="90" Width="100" Height="15" TabSkip="no" Text="Is version compatible:" />
+        <Control Id="ImageOkLabel" Type="Text" X="135" Y="90" Width="100" Height="15" TabSkip="no" Text="{\WixUI_Font_Green}OK - [IMAGE_VERSION]" Hidden="yes">
+          <Condition Action="show">IMAGE_VERSION_OK = 1</Condition>
+        </Control>
+        <Control Id="ImageNoLabel" Type="Text" X="135" Y="90" Width="100" Height="15" TabSkip="no" Text="{\WixUI_Font_Red}No - [IMAGE_VERSION]" Hidden="yes">
+          <Condition Action="show">IMAGE_VERSION_OK = 0</Condition>
+        </Control>
+        <Control Id="HaspLabel" Type="Text" X="45" Y="105" Width="100" Height="15" TabSkip="no" Text="Main HASP inserted:" />
+        <Control Id="HaspYesLabel" Type="Text" X="135" Y="105" Width="200" Height="15" TabSkip="no" Text="{\WixUI_Font_Green}OK" Hidden="yes">
+          <Condition Action="show">HASP_INSERTED = 1</Condition>
+        </Control>
+        <Control Id="HaspNoLabel" Type="Text" X="135" Y="105" Width="200" Height="15" TabSkip="no" Text="{\WixUI_Font_Red}No" Hidden="yes">
+          <Condition Action="show">HASP_INSERTED = 0</Condition>
+        </Control>
+
+        <!--THIS VERSION DOES NOT INCLUDE BOMGAR SO IT IS CLOSED-->
+        <!--<Control Id="ConnectionLabel" Type="Text" X="45" Y="120" Width="100" Height="15" TabSkip="no" Text="Network connection: "/>
+        <Control Id="ConnectionOkLabel" Type="Text" X="135" Y="120" Width="100" Height="15" TabSkip="no" Text="{\WixUI_Font_Green}OK" Hidden="yes">
+          <Condition Action="show">CONNECTION_OK = 1</Condition>
+        </Control>
+        <Control Id="ConnectionNotOkLabel" Type="Text" X="135" Y="120" Width="100" Height="15" TabSkip="no" Text="{\WixUI_Font_Red}Failed" Hidden="yes">
+          <Condition Action="show">CONNECTION_OK = 0</Condition>
+        </Control>
+
+        <Control Id="ConnectionNotRequiredLabel" Type="Text" X="135" Y="120" Width="100" Height="15" TabSkip="no" Text="{\WixUI_Font_Green}Not Req." Hidden="yes">
+          <Condition Action="show">CONNECTION_OK = 2</Condition>
+        </Control>-->
+        
+        <Control Id="ComputerNameLabel" Type="Text" X="45" Y="120" Width="100" Height="15" TabSkip="no" Text="New Computer Name: ">
+          <Condition Action="show">HASP_INSERTED = 1</Condition>
+        </Control>
+        <Control Id="ComputerNameOkLabel" Type="Text" X="135" Y="120" Width="100" Height="15" TabSkip="no" Text="[COMPUTER_NAME]" Hidden="yes">
+          <Condition Action="show">HASP_INSERTED = 1</Condition>
+        </Control>
+        <Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Text="&amp;Back">
+          <Publish Event="NewDialog" Value="WelcomeDlg">1</Publish>
+        </Control>
+        <Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Default="yes" Text="&amp;Next" Disabled="yes">
+          <Publish Event="NewDialog" Value="InstallDirDlg">1</Publish>
+          <!--THIS VERSION DOES NOT INCLUDE BOMGAR SO IT IS CLOSED-->
+          <!--<Condition Action="enable">HASP_INSERTED = 1 AND (CONNECTION_OK = 1 OR CONNECTION_OK = 2)</Condition>-->
+          <Condition Action="enable">HASP_INSERTED = 1</Condition>
+        </Control>
+        <Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Cancel="yes" Text="Cancel">
+          <Publish Event="SpawnDialog" Value="CancelDlg">1</Publish>
+        </Control>
+        <Control Id="BannerBitmap" Type="Bitmap" X="0" Y="0" Width="370" Height="44" TabSkip="no" Text="WixUI_Bmp_Banner" />
+        <Control Id="Description" Type="Text" X="25" Y="23" Width="280" Height="15" Transparent="yes" NoPrefix="yes">
+          <Text>Checking installation prerequisites</Text>
+        </Control>
+        <Control Id="BottomLine" Type="Line" X="0" Y="234" Width="370" Height="0" />
+        <Control Id="Title" Type="Text" X="15" Y="6" Width="200" Height="15" Transparent="yes" NoPrefix="yes">
+          <Text>{\WixUI_Font_Title}Checking Prerequisites</Text>
+        </Control>
+        <Control Id="BannerLine" Type="Line" X="0" Y="44" Width="370" Height="0" />
+      </Dialog>
+    </UI>
+  </Fragment>
+</Wix>
