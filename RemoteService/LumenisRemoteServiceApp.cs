@@ -11,7 +11,7 @@ namespace LumenisRemoteService
     {
         private static ServiceHost _host = null;
         private const string LOG = "Application";
-        private static string _serviceName;
+       // private static string _serviceName;
 
        // public LumenisRemoteServiceApp()
        // {
@@ -20,7 +20,7 @@ namespace LumenisRemoteService
 
         internal static string Name
         {
-            get { return _serviceName; }
+            get { return "test"; }
         }
 
         static public void Start()
@@ -34,6 +34,8 @@ namespace LumenisRemoteService
                 // Create the ServiceHost.
                 _host = new ServiceHost(typeof(RemoteService));
                 _host.Open();
+
+              
 
             }
             catch (Exception ex)

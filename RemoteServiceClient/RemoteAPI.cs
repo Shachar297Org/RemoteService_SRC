@@ -4,27 +4,45 @@ using System.Linq;
 using System.Text;
 using System.ServiceModel;
 using System.Threading;
-using Lumenis.RemoteServiceApi.LumenisRemoteService;
+//using Lumenis.RemoteServiceApi.LumenisRemoteService;
+using LumenisRemoteService;
 
 namespace Lumenis.RemoteServiceApi
 {
-    public class RemoteAPI : IDisposable
+    public partial class RemoteAPI : IDisposable
     {
-        private RemoteServiceClient _remoteService = null;
-
+       // private RemoteServiceClient _remoteService = null;
+        ChannelFactory<IRemoteService> _factory;
+        IRemoteService _remoteService;
+        NetTcpBinding myBinding = new NetTcpBinding("NetTcpBinding_RemoteService");//NetTcpBinding_RemoteService
+        EndpointAddress myEndpoint = new EndpointAddress("net.tcp://10.11.135.159:49494/RemoteService/ppool");
         public RemoteAPI()
         {
-            _remoteService = new RemoteServiceClient(new NetTcpBinding(), new EndpointAddress("net.tcp://localhost:49494/RemoteService"));
+            // _remoteService = new RemoteServiceClient(new NetTcpBinding(), new EndpointAddress("net.tcp://localhost:49494/RemoteService"));
         }
+
+        public void StartClient()
+        {
+            // _factory = new ChannelFactory<IRemoteService>(myBinding, myEndpoint);
+            _factory = new ChannelFactory<IRemoteService>(myBinding, myEndpoint);
+
+            _remoteService = _factory.CreateChannel();// as RemoteService;
+        }
+
+
+        
 
         public void Open()
         {
-            _remoteService.Open();
+            if (_factory.State != CommunicationState.Opened)
+            {
+                _factory.Open(); 
+            }
         }
 
         public void Close()
         {
-            _remoteService.Close();
+            _factory.Close();
         }
 
         public RemoteStatus GetStatus()
@@ -79,29 +97,29 @@ namespace Lumenis.RemoteServiceApi
         {
             int numRetries = 3;
 
-            while (_remoteService.State != CommunicationState.Opened && numRetries-- > 0)
+            while (_factory.State != CommunicationState.Opened && numRetries-- > 0)
             {
-                if (_remoteService.State == CommunicationState.Closing ||
-                    _remoteService.State == CommunicationState.Opening)
+                if (_factory.State == CommunicationState.Closing ||
+                    _factory.State == CommunicationState.Opening)
                 {
                     Thread.Sleep(3000);
-                    if (_remoteService.State == CommunicationState.Closing ||
-                        _remoteService.State == CommunicationState.Opening)
+                    if (_factory.State == CommunicationState.Closing ||
+                        _factory.State == CommunicationState.Opening)
                     {
                         // try to force closing
-                        _remoteService.Close();
+                        _factory.Close();
                     }
                 }
 
-                if (_remoteService.State == CommunicationState.Faulted)
+                if (_factory.State == CommunicationState.Faulted)
                 {
-                    _remoteService.Close();
+                    _factory.Close();
                 }
 
-                if (_remoteService.State == CommunicationState.Closed)
+                if (_factory.State == CommunicationState.Closed)
                 {
-                    _remoteService = new RemoteServiceClient();
-                    _remoteService.Open();
+                    _factory = new ChannelFactory<IRemoteService>(myBinding);
+                    _factory.Open();
                 }
 
                 Thread.Sleep(3000);

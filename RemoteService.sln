@@ -1,6 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29215.179
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RemoteService", "RemoteService\RemoteService.csproj", "{F4968532-0AFB-484B-A0E5-9D365EB9ACD8}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RemoteServiceApi", "RemoteServiceClient\RemoteServiceApi.csproj", "{3CA2BB56-8978-4A00-9445-211F416866E4}"
@@ -17,6 +19,8 @@ Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "RemoteServiceInstallWiX", "
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RemoteServiceInstallWixCustom", "RemoteServiceInstallWixCustom\RemoteServiceInstallWixCustom.csproj", "{5649B0FA-2319-431A-9DB1-36EBCFDEE9CF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Support_request_app", "Support_request_app\Support_request_app.csproj", "{E8A16196-9BF0-40F8-BB50-18D33B521C48}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -98,8 +102,23 @@ Global
 		{5649B0FA-2319-431A-9DB1-36EBCFDEE9CF}.Release|Mixed Platforms.Build.0 = Release|x86
 		{5649B0FA-2319-431A-9DB1-36EBCFDEE9CF}.Release|x86.ActiveCfg = Release|x86
 		{5649B0FA-2319-431A-9DB1-36EBCFDEE9CF}.Release|x86.Build.0 = Release|x86
+		{E8A16196-9BF0-40F8-BB50-18D33B521C48}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E8A16196-9BF0-40F8-BB50-18D33B521C48}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E8A16196-9BF0-40F8-BB50-18D33B521C48}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{E8A16196-9BF0-40F8-BB50-18D33B521C48}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{E8A16196-9BF0-40F8-BB50-18D33B521C48}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{E8A16196-9BF0-40F8-BB50-18D33B521C48}.Debug|x86.Build.0 = Debug|Any CPU
+		{E8A16196-9BF0-40F8-BB50-18D33B521C48}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E8A16196-9BF0-40F8-BB50-18D33B521C48}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E8A16196-9BF0-40F8-BB50-18D33B521C48}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{E8A16196-9BF0-40F8-BB50-18D33B521C48}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{E8A16196-9BF0-40F8-BB50-18D33B521C48}.Release|x86.ActiveCfg = Release|Any CPU
+		{E8A16196-9BF0-40F8-BB50-18D33B521C48}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {8C158481-D383-4918-A2E0-B7B98F1D3C16}
 	EndGlobalSection
 EndGlobal
