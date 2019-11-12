@@ -52,12 +52,17 @@ namespace Support_request_app
         {
             try
             {
-
+                RequestSupport.StopSupport();
             }
             catch (Exception ex)
             {
 
             }
+        }
+
+        private void ResetSessionTime_Click(object sender, RoutedEventArgs e)
+        {
+            RequestSupport.RenewSessionLimit();
         }
     }
 }

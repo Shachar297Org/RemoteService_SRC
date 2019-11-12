@@ -15,12 +15,31 @@ namespace Lumenis.RemoteServiceApi
 
         }
 
+        public bool StopScreenConnect()
+        {
+            return _remoteService.StopService();
+        }
+
         public ScreeenConnectServiceStatus GetScreenConnectStatus()
         {
             return _remoteService.GetScreenConnectStatus();
         }
+
+        public ScreeenConnectSessionStatus GetSessionStatus()
+        {
+            return _remoteService.GetSessiontStatus();
+        }
+
+        public void RenewSessionLimit()
+        {
+             _remoteService.RenewSessionLimit();
+        }
+
+        public TimeSpan GetRemainingTime()
+        {
+            return _remoteService.SessionTimeLeft();
+        }
+
     }
-    //class ConnectWise_RemoteAPI
-    //{
-    //}
+    
 }

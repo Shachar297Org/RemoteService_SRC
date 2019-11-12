@@ -16,7 +16,7 @@ namespace Lumenis.RemoteServiceApi
         ChannelFactory<IRemoteService> _factory;
         IRemoteService _remoteService;
         NetTcpBinding myBinding = new NetTcpBinding("NetTcpBinding_RemoteService");//NetTcpBinding_RemoteService
-        EndpointAddress myEndpoint = new EndpointAddress("net.tcp://10.11.135.159:49494/RemoteService/ppool");
+        EndpointAddress myEndpoint = new EndpointAddress("net.tcp://localhost:49494/RemoteService/ppool");
         public RemoteAPI()
         {
             // _remoteService = new RemoteServiceClient(new NetTcpBinding(), new EndpointAddress("net.tcp://localhost:49494/RemoteService"));

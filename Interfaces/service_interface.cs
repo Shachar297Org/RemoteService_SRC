@@ -26,7 +26,14 @@ namespace Interfaces
     [DataContract]
     public enum ScreeenConnectSessionStatus
     {
-
+        [EnumMember]
+        None,
+        [EnumMember]
+        CableDisconnected,
+        [EnumMember]
+        SessionInStandby,
+        [EnumMember]
+        SessionIsActive
     }
 
     [DataContract]
@@ -89,6 +96,15 @@ namespace Interfaces
         [OperationContract]
 
         ScreeenConnectServiceStatus GetScreenConnectStatus();
+
+        [OperationContract]
+        ScreeenConnectSessionStatus GetSessiontStatus();
+
+        [OperationContract]
+        void RenewSessionLimit();
+
+        [OperationContract]
+        TimeSpan SessionTimeLeft();
 
 
         #endregion

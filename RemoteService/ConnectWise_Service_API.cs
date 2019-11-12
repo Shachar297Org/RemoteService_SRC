@@ -43,6 +43,23 @@ namespace LumenisRemoteService
             return _wiseControl.ServiceStatus;
         }
 
+        public ScreeenConnectSessionStatus GetSessiontStatus()
+        {
+            return _wiseControl.SessionStatus;
+        }
+
+       
+        public void RenewSessionLimit()
+        {
+            _wiseControl.RenewSessionTimer();
+        }
+
+       
+        public TimeSpan SessionTimeLeft()
+        {
+            return _wiseControl.SessionTimeLeft();
+        }
+
 
     }
 }

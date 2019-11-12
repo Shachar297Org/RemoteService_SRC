@@ -25,7 +25,7 @@ namespace Support_request_app
     public class RequestModel : BaseNotifier
     {
         RemoteAPI remoteApi = new RemoteAPI();
-        System.Timers.Timer _timer = new System.Timers.Timer(1000);//this timer also for getting the status but also for keep alive check
+        System.Timers.Timer _timer = new System.Timers.Timer(3000);//this timer also for getting the status but also for keep alive check
 
 
 
@@ -39,7 +39,7 @@ namespace Support_request_app
         {
             try
             {
-                GetServiceStatus();//todo should only be performed if user app is active and not minimized
+                GetStatuses();//todo should only be performed if user app is active and not minimized
             }
             catch(Exception ex)
             {
@@ -51,31 +51,65 @@ namespace Support_request_app
         {
             remoteApi.StartScreenConnect();
             var result = remoteApi.GetScreenConnectStatus();
-            ServiceStatus = ConvertEnum(result);
+            ServiceStatus = ConvertServiceStatusEnum(result);
            
         }
 
-        public void GetServiceStatus()
+        public void StopSupport()
         {
-            var result = remoteApi.GetScreenConnectStatus();
+            remoteApi.StopScreenConnect();
+        }
+
+        public void GetStatuses()
+        {
+            var serviceStatusResult = remoteApi.GetScreenConnectStatus();
+            var sessionStatusResult = remoteApi.GetSessionStatus();
+
             Application.Current.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Normal, new Action(() =>
             {
-                ServiceStatus = ConvertEnum(result);
+                ServiceStatus = ConvertServiceStatusEnum(serviceStatusResult);
+                SessionStatus = ConvertSessionStatusEnum(sessionStatusResult);
             }));
         }
+
+        public void RenewSessionLimit()
+        {
+            remoteApi.RenewSessionLimit();
+        }
+
+        public void GetRemainingSessionTime()
+        {
+            var result = remoteApi.GetRemainingTime();
+            Application.Current.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Normal, new Action(() =>
+            {
+                SessionTimeLeft = result;
+            }));
+        }
+
+        
+
+       
 
 
 
         private bool _isServiceConnected = false;
 
         private string _serviceStatus = "None";
+        private string _sessionStatus = "None";
+
+        private TimeSpan _sessionTimeLeft;//todo add converter before attaching to the GUI
+
 
         public bool IsServiceConnected { get { return _isServiceConnected; } set { _isServiceConnected = value; OnPropertyChanged("IsServiceConnected"); } }
 
         //ScreeenConnectServiceStatus
         public string ServiceStatus { get { return _serviceStatus; } set { _serviceStatus = value; OnPropertyChanged("ServiceStatus"); } }
 
-        private string ConvertEnum(ScreeenConnectServiceStatus p_enum)
+        public string SessionStatus { get { return _sessionStatus; } set { _sessionStatus = value; OnPropertyChanged("SessionStatus"); } }
+
+        public TimeSpan SessionTimeLeft { get { return _sessionTimeLeft; } set { _sessionTimeLeft = value; OnPropertyChanged("SessionTimeLeft"); } }
+
+        private string ConvertServiceStatusEnum(ScreeenConnectServiceStatus p_enum)
         {
             switch(p_enum)
             {
@@ -83,6 +117,18 @@ namespace Support_request_app
                 case ScreeenConnectServiceStatus.NotInstalled: return "Service not installed";
                 case ScreeenConnectServiceStatus.Running: return "Service is running";
                 case ScreeenConnectServiceStatus.Stopped: return "Service stopped";
+                default: return "Unknown";
+            }
+        }
+
+        private string ConvertSessionStatusEnum(ScreeenConnectSessionStatus p_enum)
+        {
+            switch (p_enum)
+            {
+                case ScreeenConnectSessionStatus.None: return "Unknown";
+                case ScreeenConnectSessionStatus.CableDisconnected: return "Cable is disconnected";
+                case ScreeenConnectSessionStatus.SessionInStandby: return "Session in standby";
+                case ScreeenConnectSessionStatus.SessionIsActive: return "Session is active";
                 default: return "Unknown";
             }
         }
