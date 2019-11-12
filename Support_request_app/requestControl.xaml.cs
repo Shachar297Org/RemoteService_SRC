@@ -20,16 +20,27 @@ namespace Support_request_app
     /// </summary>
     public partial class requestControl : UserControl
     {
+
+        public static readonly DependencyProperty RequestModelProperty =
+        DependencyProperty.Register("RequestSupport", typeof(RequestModel), typeof(requestControl), null);
+
+        public RequestModel RequestSupport
+        {
+            set { SetValue(RequestModelProperty, value); }
+            get { return (RequestModel)GetValue(RequestModelProperty); }
+        }
+
         public requestControl()
         {
             InitializeComponent();
+            RequestSupport = new RequestModel();
         }
 
         private void Invite_click(object sender, RoutedEventArgs e)
         {
             try
             {
-
+                RequestSupport.RequestSupport();
             }
             catch (Exception ex)
             {

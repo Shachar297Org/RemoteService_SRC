@@ -22,6 +22,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RemoteServiceInstallWixCust
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Support_request_app", "Support_request_app\Support_request_app.csproj", "{E8A16196-9BF0-40F8-BB50-18D33B521C48}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Interfaces", "Interfaces\Interfaces.csproj", "{50AF1E57-AC3B-4C51-BC5C-3057893D4A30}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -114,6 +116,18 @@ Global
 		{E8A16196-9BF0-40F8-BB50-18D33B521C48}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{E8A16196-9BF0-40F8-BB50-18D33B521C48}.Release|x86.ActiveCfg = Release|Any CPU
 		{E8A16196-9BF0-40F8-BB50-18D33B521C48}.Release|x86.Build.0 = Release|Any CPU
+		{50AF1E57-AC3B-4C51-BC5C-3057893D4A30}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{50AF1E57-AC3B-4C51-BC5C-3057893D4A30}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{50AF1E57-AC3B-4C51-BC5C-3057893D4A30}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{50AF1E57-AC3B-4C51-BC5C-3057893D4A30}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{50AF1E57-AC3B-4C51-BC5C-3057893D4A30}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{50AF1E57-AC3B-4C51-BC5C-3057893D4A30}.Debug|x86.Build.0 = Debug|Any CPU
+		{50AF1E57-AC3B-4C51-BC5C-3057893D4A30}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{50AF1E57-AC3B-4C51-BC5C-3057893D4A30}.Release|Any CPU.Build.0 = Release|Any CPU
+		{50AF1E57-AC3B-4C51-BC5C-3057893D4A30}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{50AF1E57-AC3B-4C51-BC5C-3057893D4A30}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{50AF1E57-AC3B-4C51-BC5C-3057893D4A30}.Release|x86.ActiveCfg = Release|Any CPU
+		{50AF1E57-AC3B-4C51-BC5C-3057893D4A30}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

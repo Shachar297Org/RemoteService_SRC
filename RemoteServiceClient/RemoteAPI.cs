@@ -5,7 +5,8 @@ using System.Text;
 using System.ServiceModel;
 using System.Threading;
 //using Lumenis.RemoteServiceApi.LumenisRemoteService;
-using LumenisRemoteService;
+//using LumenisRemoteService;
+using Interfaces;
 
 namespace Lumenis.RemoteServiceApi
 {

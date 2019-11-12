@@ -107,9 +107,9 @@
     <None Include="app.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\RemoteService\RemoteService.csproj">
-      <Project>{f4968532-0afb-484b-a0e5-9d365eb9acd8}</Project>
-      <Name>RemoteService</Name>
+    <ProjectReference Include="..\Interfaces\Interfaces.csproj">
+      <Project>{50AF1E57-AC3B-4C51-BC5C-3057893D4A30}</Project>
+      <Name>Interfaces</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

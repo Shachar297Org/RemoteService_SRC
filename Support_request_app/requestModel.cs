@@ -20,13 +20,13 @@ namespace Support_request_app
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
-    class RequestModel : BaseNotifier
+    public class RequestModel : BaseNotifier
     {
         RemoteAPI remoteApi = new RemoteAPI();
 
         public RequestModel()
         {
-           
+            remoteApi.StartClient();
         }
 
         public void RequestSupport()
