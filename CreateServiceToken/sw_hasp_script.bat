@@ -1,0 +1,1 @@
+start /d "D:\viewstore\ofir.shtainfeld.CORP\alexey.jilinsky_RemoteService_W10_2\RemoteService\RemoteService_SRC\CreateServiceToken\bin\Debug\" ServiceToken.exe c 10001

@@ -9,6 +9,27 @@ using System.Threading.Tasks;
 namespace Interfaces
 {
     [DataContract]
+    public enum ScreeenConnectServiceStatus
+    {
+        [EnumMember]
+        None,
+        [EnumMember]
+        NotInstalled,
+        [EnumMember]
+        Running,
+        [EnumMember]
+        Stopped,
+        [EnumMember]
+        Unstable
+    }
+
+    [DataContract]
+    public enum ScreeenConnectSessionStatus
+    {
+
+    }
+
+    [DataContract]
     public struct RemoteStatus
     {
         [DataMember]
@@ -67,7 +88,7 @@ namespace Interfaces
 
         [OperationContract]
 
-        string GetScreenConnectStatus();
+        ScreeenConnectServiceStatus GetScreenConnectStatus();
 
 
         #endregion

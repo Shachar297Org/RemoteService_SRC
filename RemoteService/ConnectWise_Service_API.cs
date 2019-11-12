@@ -37,9 +37,10 @@ namespace LumenisRemoteService
             return false;
         }
 
-        public string GetScreenConnectStatus()
+        public ScreeenConnectServiceStatus GetScreenConnectStatus()
         {
-            return "under construction";
+            _wiseControl.UserAppISActive();
+            return _wiseControl.ServiceStatus;
         }
 
 

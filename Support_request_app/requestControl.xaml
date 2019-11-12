@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Support_request_app"
+             x:Name="req_elem"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="450">
     <Grid>
@@ -18,7 +19,7 @@
             <Button Content="Invite Support" Click="Invite_click"/>
             <Button Content="Stop Support" Click="Stop_Click"/>
             <TextBlock Text=" Support Status"/>
-            <TextBox/>
+            <TextBox Text="{Binding RequestSupport.ServiceStatus,ElementName=req_elem}"/>
         </StackPanel>
     </Grid>
 </UserControl>

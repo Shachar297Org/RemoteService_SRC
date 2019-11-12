@@ -81,6 +81,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <None Include="sw_hasp_script.bat" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Connected Services\" />

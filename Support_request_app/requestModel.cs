@@ -1,4 +1,5 @@
-﻿using Lumenis.RemoteServiceApi;
+﻿using Interfaces;
+using Lumenis.RemoteServiceApi;
 using LumenisRemoteService;
 using System;
 using System.Collections.Generic;
@@ -7,6 +8,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace Support_request_app
 {
@@ -23,27 +25,67 @@ namespace Support_request_app
     public class RequestModel : BaseNotifier
     {
         RemoteAPI remoteApi = new RemoteAPI();
+        System.Timers.Timer _timer = new System.Timers.Timer(1000);//this timer also for getting the status but also for keep alive check
+
+
 
         public RequestModel()
         {
             remoteApi.StartClient();
+            _timer.Elapsed += _timer_Elapsed;
+        }
+
+        private void _timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        {
+            try
+            {
+                GetServiceStatus();//todo should only be performed if user app is active and not minimized
+            }
+            catch(Exception ex)
+            {
+
+            }
         }
 
         public void RequestSupport()
         {
             remoteApi.StartScreenConnect();
+            var result = remoteApi.GetScreenConnectStatus();
+            ServiceStatus = ConvertEnum(result);
+           
         }
 
         public void GetServiceStatus()
         {
-           // remoteApi.GetScreenConnectStatus();
+            var result = remoteApi.GetScreenConnectStatus();
+            Application.Current.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Normal, new Action(() =>
+            {
+                ServiceStatus = ConvertEnum(result);
+            }));
         }
 
 
 
         private bool _isServiceConnected = false;
 
+        private string _serviceStatus = "None";
+
         public bool IsServiceConnected { get { return _isServiceConnected; } set { _isServiceConnected = value; OnPropertyChanged("IsServiceConnected"); } }
+
+        //ScreeenConnectServiceStatus
+        public string ServiceStatus { get { return _serviceStatus; } set { _serviceStatus = value; OnPropertyChanged("ServiceStatus"); } }
+
+        private string ConvertEnum(ScreeenConnectServiceStatus p_enum)
+        {
+            switch(p_enum)
+            {
+                case ScreeenConnectServiceStatus.None: return "Unknown";
+                case ScreeenConnectServiceStatus.NotInstalled: return "Service not installed";
+                case ScreeenConnectServiceStatus.Running: return "Service is running";
+                case ScreeenConnectServiceStatus.Stopped: return "Service stopped";
+                default: return "Unknown";
+            }
+        }
     }
 
 

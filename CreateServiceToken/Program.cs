@@ -7,7 +7,7 @@ namespace Limenis.ServiceToken
     {
         static void Main(string[] args)
         {
-            System.Threading.Thread.Sleep(5000);
+            System.Threading.Thread.Sleep(30000);
             // Parse parameters
             if (args.Length < 1)
             {
@@ -76,6 +76,7 @@ namespace Limenis.ServiceToken
             {
                 Console.Error.WriteLine("Cannot create service token: {0}", ex.Message);
             }
+           // Console.ReadKey();
         }
 
         private static void Usage()
