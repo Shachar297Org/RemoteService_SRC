@@ -1,4 +1,5 @@
 ﻿using Interfaces;
+using Logging;
 using Lumenis.RemoteServiceApi;
 using LumenisRemoteService;
 using System;
@@ -24,26 +25,36 @@ namespace Support_request_app
     }
     public class RequestModel : BaseNotifier
     {
-        RemoteAPI remoteApi = new RemoteAPI();
+        private static readonly ILogger Logger = LoggerFactory.Default.GetCurrentClassLogger();
+        RemoteAPI remoteApi = null; 
         System.Timers.Timer _timer = new System.Timers.Timer(3000);//this timer also for getting the status but also for keep alive check
 
 
 
         public RequestModel()
         {
-            remoteApi.StartClient();
-            _timer.Elapsed += _timer_Elapsed;
+            try
+            {
+                remoteApi = new RemoteAPI();
+                remoteApi.StartClient();
+                _timer.Elapsed += _timer_Elapsed;
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex);
+            }
         }
 
         private void _timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
             try
             {
+                Logger.Warning("Failed to cast setting");
                 GetStatuses();//todo should only be performed if user app is active and not minimized
             }
             catch(Exception ex)
             {
-
+                Logger.Error(ex);
             }
         }
 

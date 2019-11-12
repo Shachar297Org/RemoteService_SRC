@@ -94,6 +94,9 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="NLog.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -107,6 +110,10 @@
       <Project>{50af1e57-ac3b-4c51-bc5c-3057893d4a30}</Project>
       <Name>Interfaces</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Logging\Logging.csproj">
+      <Project>{7aca1d53-53c5-4d82-bc1f-e47f542e2bae}</Project>
+      <Name>Logging</Name>
+    </ProjectReference>
     <ProjectReference Include="..\RemoteServiceClient\RemoteServiceApi.csproj">
       <Project>{3ca2bb56-8978-4a00-9445-211f416866e4}</Project>
       <Name>RemoteServiceApi</Name>
@@ -115,6 +122,11 @@
       <Project>{f4968532-0afb-484b-a0e5-9d365eb9acd8}</Project>
       <Name>RemoteService</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="NLog.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Logging;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,7 +21,7 @@ namespace Support_request_app
     /// </summary>
     public partial class requestControl : UserControl
     {
-
+        private static readonly ILogger Logger = LoggerFactory.Default.GetCurrentClassLogger();
         public static readonly DependencyProperty RequestModelProperty =
         DependencyProperty.Register("RequestSupport", typeof(RequestModel), typeof(requestControl), null);
 
@@ -62,6 +63,7 @@ namespace Support_request_app
 
         private void ResetSessionTime_Click(object sender, RoutedEventArgs e)
         {
+            Logger.Debug("test");
             RequestSupport.RenewSessionLimit();
         }
     }
