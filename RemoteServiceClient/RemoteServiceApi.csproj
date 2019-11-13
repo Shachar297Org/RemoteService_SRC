@@ -111,6 +111,10 @@
       <Project>{50AF1E57-AC3B-4C51-BC5C-3057893D4A30}</Project>
       <Name>Interfaces</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Logging\Logging.csproj">
+      <Project>{7ACA1D53-53C5-4D82-BC1F-E47F542E2BAE}</Project>
+      <Name>Logging</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

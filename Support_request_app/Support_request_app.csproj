@@ -34,6 +34,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -94,6 +97,7 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="app.manifest" />
     <None Include="NLog.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -117,10 +121,6 @@
     <ProjectReference Include="..\RemoteServiceClient\RemoteServiceApi.csproj">
       <Project>{3ca2bb56-8978-4a00-9445-211f416866e4}</Project>
       <Name>RemoteServiceApi</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\RemoteService\RemoteService.csproj">
-      <Project>{f4968532-0afb-484b-a0e5-9d365eb9acd8}</Project>
-      <Name>RemoteService</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

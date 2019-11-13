@@ -1,4 +1,5 @@
 ﻿using Interfaces;
+using Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,30 +16,37 @@ namespace LumenisRemoteService
     /// </summary>
     public partial class RemoteService : IRemoteService
     {
+        private static readonly ILogger Logger = LoggerFactory.Default.GetCurrentClassLogger();
         ConnectWiseController _wiseControl = new ConnectWiseController();
         //[OperationContract]
         public bool StartScreenConnect()
         {
-            if(_wiseControl.DetectService())
-            {
+            Logger.Debug("StartScreenConnect");
+           // if(_wiseControl.DetectService())
+            //{
               return  _wiseControl.Open();
-            }
+           // }
             return false;
             //ActionDispatcher.Instance.StartService();
         }
 
         public bool StopService()
         {
-            if (_wiseControl.DetectService())
-            {
-                _wiseControl.MonitorSession();
-            }
-            _wiseControl.Close();
-            return false;
+            Logger.Debug("StopService");
+           // if (_wiseControl.DetectService())
+           // {
+               return _wiseControl.Close();
+           // }
+            //else
+            //{
+            //    return false;
+           //}
+            
         }
 
         public ScreeenConnectServiceStatus GetScreenConnectStatus()
         {
+            Logger.Debug("GetScreenConnectStatus");
             _wiseControl.UserAppISActive();
             return _wiseControl.ServiceStatus;
         }
@@ -51,12 +59,14 @@ namespace LumenisRemoteService
        
         public void RenewSessionLimit()
         {
+            Logger.Debug("RenewSessionLimit");
             _wiseControl.RenewSessionTimer();
         }
 
        
         public TimeSpan SessionTimeLeft()
         {
+            Logger.Debug("SessionTimeLeft");
             return _wiseControl.SessionTimeLeft();
         }
 

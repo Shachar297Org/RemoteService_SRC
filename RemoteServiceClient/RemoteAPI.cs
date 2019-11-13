@@ -7,27 +7,41 @@ using System.Threading;
 //using Lumenis.RemoteServiceApi.LumenisRemoteService;
 //using LumenisRemoteService;
 using Interfaces;
+using Logging;
 
 namespace Lumenis.RemoteServiceApi
 {
     public partial class RemoteAPI : IDisposable
     {
-       // private RemoteServiceClient _remoteService = null;
+        private static readonly ILogger Logger = LoggerFactory.Default.GetCurrentClassLogger();
+        // private RemoteServiceClient _remoteService = null;
         ChannelFactory<IRemoteService> _factory;
         IRemoteService _remoteService;
-        NetTcpBinding myBinding = new NetTcpBinding("NetTcpBinding_RemoteService");//NetTcpBinding_RemoteService
-        EndpointAddress myEndpoint = new EndpointAddress("net.tcp://localhost:49494/RemoteService/ppool");
+        NetTcpBinding myBinding = null;//NetTcpBinding_RemoteService
+        EndpointAddress myEndpoint = null;
+        
+
+
         public RemoteAPI()
         {
-            // _remoteService = new RemoteServiceClient(new NetTcpBinding(), new EndpointAddress("net.tcp://localhost:49494/RemoteService"));
+             myBinding = new NetTcpBinding("NetTcpBinding_RemoteService");//NetTcpBinding_RemoteService
+             myEndpoint = new EndpointAddress("net.tcp://localhost:49494/RemoteService/ppool");
+            Logger.Debug("end point address is {0}","net.tcp://localhost:49494/RemoteService/ppool");
         }
 
         public void StartClient()
         {
             // _factory = new ChannelFactory<IRemoteService>(myBinding, myEndpoint);
-            _factory = new ChannelFactory<IRemoteService>(myBinding, myEndpoint);
+            try
+            {
+                _factory = new ChannelFactory<IRemoteService>(myBinding, myEndpoint);
 
-            _remoteService = _factory.CreateChannel();// as RemoteService;
+                _remoteService = _factory.CreateChannel();// as RemoteService;
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex);
+            }
         }
 
 

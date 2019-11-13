@@ -63,7 +63,6 @@ namespace Support_request_app
 
         private void ResetSessionTime_Click(object sender, RoutedEventArgs e)
         {
-            Logger.Debug("test");
             RequestSupport.RenewSessionLimit();
         }
     }

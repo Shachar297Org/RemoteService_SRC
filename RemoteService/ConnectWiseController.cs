@@ -1,4 +1,5 @@
 ﻿using Interfaces;
+using Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,12 +17,13 @@ namespace LumenisRemoteService
 
     class ConnectWiseController
     {
-
+        private static readonly ILogger Logger = LoggerFactory.Default.GetCurrentClassLogger();
         private readonly string JUMP_CLIENT_SERVICE_NAME_PREFIX;
         private ServiceController _service = null;
         private bool _serviceInstalled = false;
         private bool _requestForSupportWasMade = false; //signal if the user app sent request for support
         private bool _userAppIsRunning = false;
+        private object _syncObj = new object();
 
         #region Session monitoring flag
 
@@ -42,31 +44,44 @@ namespace LumenisRemoteService
 
         public ConnectWiseController()
         {
-            JUMP_CLIENT_SERVICE_NAME_PREFIX = "ScreenConnect";//todo name should also be fetched from configuration file
-
-
-
-            _timer = new System.Timers.Timer(MONITORINTERVAL);
-            _timer.Elapsed += _timer_Elapsed;
-            _timer.Start();
-
-            _sessionReadyLimittimer = new System.Timers.Timer(SESSIONLIMITINTERVAL);
-            _sessionReadyLimittimer.Elapsed += _sessionReadyLimittimer_Elapsed;
-            
-
-            //ServiceController[] _services = ServiceController.GetServices();
-            _service = ServiceController.GetServices().
-                   FirstOrDefault(s => s.ServiceName.ToLower().StartsWith(JUMP_CLIENT_SERVICE_NAME_PREFIX));
-
-
-            if (_service == null)
+            try
             {
-                _serviceInstalled = false;
+                JUMP_CLIENT_SERVICE_NAME_PREFIX = "ScreenConnect Client";//todo name should also be fetched from configuration file
+
+                Logger.Information("searching for service name {0}", JUMP_CLIENT_SERVICE_NAME_PREFIX);
+
+                _timer = new System.Timers.Timer(MONITORINTERVAL);
+                _timer.Elapsed += _timer_Elapsed;
+                _timer.Start();
+
+                _sessionReadyLimittimer = new System.Timers.Timer(SESSIONLIMITINTERVAL);
+                _sessionReadyLimittimer.Elapsed += _sessionReadyLimittimer_Elapsed;
+
+
+                //ServiceController[] _services = ServiceController.GetServices();
+                _service = ServiceController.GetServices().
+                       FirstOrDefault(s => s.DisplayName.StartsWith(JUMP_CLIENT_SERVICE_NAME_PREFIX));
+
+                //_service = ServiceController.GetServices().
+                      // FirstOrDefault(s => s.ServiceName.ToLower() == JUMP_CLIENT_SERVICE_NAME_PREFIX);
+
+
+                if (_service == null)
+                {
+                    Logger.Warning("service not installed");
+                    _serviceInstalled = false;
+                }
+                else
+                {
+                    Logger.Information("service installed");
+                    _serviceInstalled = true;
+                }
             }
-            else
+            catch (Exception ex)
             {
-                _serviceInstalled = true;
+                Logger.Error(ex);
             }
+
 
         }
 
@@ -75,12 +90,16 @@ namespace LumenisRemoteService
             try
             {
                 _sessionReadyLimittimer.Stop();
-                _requestForSupportWasMade = false;// will terminate Screen connect service
+                Logger.Debug("session reached to it's limit");
+                lock (_syncObj)
+                {
+                    _requestForSupportWasMade = false;// will terminate Screen connect service 
+                }
                 _sessionReadyLimittimer.Start();
             }
             catch( Exception ex)
             {
-
+                Logger.Error(ex);
             }
         }
 
@@ -90,13 +109,26 @@ namespace LumenisRemoteService
             {
                 _timer.Stop();
                 MonitorServiceStatus();
-                MonitorSession();
-                _timer.Start();
+                if (ServiceStatus == ScreeenConnectServiceStatus.Running)
+                {
+                    MonitorSession(); 
+                }
+                else
+                {
+                    lock (_syncObj)
+                    {
+                        SessionStatus = ScreeenConnectSessionStatus.SessionIsActive; 
+                    }
+                }
+               
             }
             catch (Exception ex)
             {
-
-                
+                Logger.Error(ex);
+            }
+            finally
+            {
+                _timer.Start();
             }
             
         }
@@ -106,15 +138,20 @@ namespace LumenisRemoteService
         /// Detect ScreenConnect service in run state. if in stopped state DetectService will return false.
         /// </summary>
         /// <returns></returns>
-        public bool DetectService()
-        {
-            
-            if(_service!= null && _service.Status == ServiceControllerStatus.Running)
-            {
-                return true;
-            }
-            return false;
-        }
+        //public bool DetectService()
+        //{
+
+        //    if (_service != null && _service.Status == ServiceControllerStatus.Running)
+        //    {
+        //        Logger.Debug("service detected");
+        //        return true;
+        //    }
+        //    else
+        //    {
+        //        Logger.Debug("service was not detected");
+        //        return false;
+        //    }
+        //}
 
         /// <summary>
         /// if screen connect service exist turn it to run state
@@ -126,19 +163,26 @@ namespace LumenisRemoteService
             {
                 if (_service != null && _service.Status == ServiceControllerStatus.Paused || _service.Status == ServiceControllerStatus.Stopped)
                 {
+                    Logger.Debug("starting service");
                     _service.Start();
-                    _requestForSupportWasMade = true;
+                    lock (_syncObj)
+                    {
+                        _requestForSupportWasMade = true; 
+                    }
                     _sessionReadyLimittimer.Start();
                     //System.Threading.Thread.Sleep(10000);
                     return true;
                 }
                 else // if service status is other than the both above
                 {
+                    Logger.Warning("didn't start the service. service installation status is {0}. service operation status is {1}",_service == null?"not installed": "installed", _service?.Status);
                     return false;
                 }
             }
             catch (Exception ex)
             {
+
+                Logger.Error(ex);
                 return false;
             }
             
@@ -148,8 +192,13 @@ namespace LumenisRemoteService
         {
             if(SessionStatus == ScreeenConnectSessionStatus.SessionInStandby || SessionStatus == ScreeenConnectSessionStatus.SessionIsActive)
             {
-                _requestForSupportWasMade = true;
+                lock (_syncObj)
+                {
+                    _requestForSupportWasMade = true; 
+                }
                 _sessionReadyLimittimer.Start();
+                TimeSpan ts = _sessionWatch.Elapsed;
+                Logger.Debug("session timer elapsed time when renewing session is hors {1}, minutes {1} and seconds {2}",ts.TotalHours,ts.TotalMinutes,ts.TotalSeconds);
                 _sessionWatch.Reset();
                 _sessionWatch.Start();
             }
@@ -172,7 +221,11 @@ namespace LumenisRemoteService
             {
                 if (_service != null && _service.Status == ServiceControllerStatus.Running)
                 {
-                    _requestForSupportWasMade = false;
+                    Logger.Debug("stop service command");
+                    lock (_syncObj)
+                    {
+                        _requestForSupportWasMade = false; 
+                    }
                     _sessionReadyLimittimer.Stop();
                     _service.Stop();
                     //System.Threading.Thread.Sleep(10000);
@@ -185,54 +238,98 @@ namespace LumenisRemoteService
             }
             catch (Exception ex)
             {
+
+
                 return false;
             }
         }
 
-        
 
-       
+
+
 
         /// <summary>
         /// Monitor the service status itself
         /// </summary>
         private void MonitorServiceStatus()
         {
-            if(_serviceInstalled)
+            try
             {
-                
-                _service.Refresh();
-                if (_service.Status == ServiceControllerStatus.Running)
+                ScreeenConnectServiceStatus _lastStatus = ServiceStatus;
+                bool statusChanged = false;
+                lock (_syncObj)
                 {
-                    if(!_requestForSupportWasMade || !_userAppIsRunning)// if the service is running (online on dashboard) but no request for support was made. or if user app is down
+                    if (_serviceInstalled)
                     {
-                        _service.Stop();
-                        System.Threading.Thread.Sleep(5000);
-                        return;//wait of the next timer tick
+
+                        _service.Refresh();
+
+                        if (_service.Status == ServiceControllerStatus.Running)
+                        {
+                            if (!_requestForSupportWasMade || !_userAppIsRunning)// if the service is running (online on dashboard) but no request for support was made. or if user app is down
+                            {
+                                Logger.Debug("stopping service because request support time frame was over or because user app not running. request flag {0} , user app flag {1}", _requestForSupportWasMade, _userAppIsRunning);
+                                Close();
+                                System.Threading.Thread.Sleep(5000);
+                                return;//wait of the next timer tick
+                            }
+                            if (_lastStatus != ScreeenConnectServiceStatus.Running)
+                            {
+                                statusChanged = true;
+                                ServiceStatus = ScreeenConnectServiceStatus.Running;
+                            }
+                        }
+                        else if (_service.Status == ServiceControllerStatus.Stopped)
+                        {
+                            if (_lastStatus != ScreeenConnectServiceStatus.Stopped)
+                            {
+                                statusChanged = true;
+                                ServiceStatus = ScreeenConnectServiceStatus.Stopped;
+                            }
+                        }
+                        else
+                        {
+                            if (_lastStatus != ScreeenConnectServiceStatus.Unstable)
+                            {
+                                statusChanged = true;
+                                ServiceStatus = ScreeenConnectServiceStatus.Unstable;
+                            }
+                        }
                     }
-                    ServiceStatus = ScreeenConnectServiceStatus.Running;
-                }
-                else if(_service.Status == ServiceControllerStatus.Stopped)
-                {
-                    ServiceStatus = ScreeenConnectServiceStatus.Stopped;
-                }
-                else
-                {
-                    ServiceStatus = ScreeenConnectServiceStatus.Unstable;
+                    else
+                    {
+                        if (_lastStatus != ScreeenConnectServiceStatus.NotInstalled)
+                        {
+                            statusChanged = true;
+                            ServiceStatus = ScreeenConnectServiceStatus.NotInstalled;
+                        }
+                    }
+
+                    if (statusChanged)
+                    {
+                        Logger.Debug("service status is {0}", ServiceStatus.ToString());
+                    }
+                    // Logger.Debug("user app flag is pulled to false");
+
+                    _userAppIsRunning = false; // set the user app activity flag to false 
                 }
             }
-            else
+            catch (Exception ex)
             {
-                ServiceStatus = ScreeenConnectServiceStatus.NotInstalled;
+                Logger.Error(ex);
             }
-            _userAppIsRunning = false; // set the user app activity flag to false
         }
 
        
 
         internal void UserAppISActive()
         {
-            _userAppIsRunning = true;
+
+            lock (_syncObj)
+            {
+                //Logger.Debug("user app flag is pulled to true");
+                _userAppIsRunning = true;
+            }
         }
 
         #region Session monitoring
@@ -242,27 +339,37 @@ namespace LumenisRemoteService
         /// </summary>
         public void MonitorSession()
         {
-            var result = NetworkHelper.GetEthernetAddress();
-            if (result != null && result != string.Empty && result != "0.0.0.0")
+            try
             {
-                _receivedIp = true;
-            }
-
-            if(_receivedIp)//check if port 443 is in used
-            {
-                _isPortOpened = NetworkHelper.CheckIfSessionEstablished();
-                if(!_isPortOpened)
+                var result = NetworkHelper.GetEthernetAddress();
+                if (result != null && result != string.Empty && result != "0.0.0.0")
                 {
-                    SessionStatus = ScreeenConnectSessionStatus.SessionIsActive;
+                    //Logger.Information("device received ip address {0}",result);
+                    _receivedIp = true;
+                }
+
+                if (_receivedIp)//check if port 443 is in used
+                {
+                    _isPortOpened = NetworkHelper.CheckIfSessionEstablished();
+                    if (!_isPortOpened)
+                    {
+                        SessionStatus = ScreeenConnectSessionStatus.SessionIsActive;
+                    }
+                    else
+                    {
+                        SessionStatus = ScreeenConnectSessionStatus.SessionInStandby;
+                    }
                 }
                 else
                 {
-                    SessionStatus = ScreeenConnectSessionStatus.SessionInStandby;
+                    SessionStatus = ScreeenConnectSessionStatus.CableDisconnected;
                 }
+
+                Logger.Debug("session status is {0}", SessionStatus);
             }
-            else
+            catch (Exception ex)
             {
-                SessionStatus = ScreeenConnectSessionStatus.CableDisconnected;
+                Logger.Error("can't continue monitoring the session");
             }
         }
 

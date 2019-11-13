@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Logging;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -10,6 +11,7 @@ namespace LumenisRemoteService
 {
     class NetworkHelper
     {
+        private static readonly ILogger Logger = LoggerFactory.Default.GetCurrentClassLogger();
         public static string GetEthernetAddress()
         {
             List<IPAddress> gatewaysList = null;
@@ -35,7 +37,7 @@ namespace LumenisRemoteService
             }
             catch (Exception ex)
             {
-
+                Logger.Error(ex);
                 return Address;
             }
         }
@@ -68,7 +70,7 @@ namespace LumenisRemoteService
             }
             catch (Exception ex)
             {
-
+                Logger.Error(ex);
             }
             return string.Empty;
         }
@@ -133,7 +135,7 @@ namespace LumenisRemoteService
             }
             catch (Exception ex)
             {
-
+                Logger.Error(ex);
                 return gatewaysList;
             }
         }
@@ -141,25 +143,33 @@ namespace LumenisRemoteService
 
         public static bool CheckIfSessionEstablished()
         {
-            int port = 443; //<--- This is your value
-            bool isAvailable = true;
-
-            // Evaluate current system tcp connections. This is the same information provided
-            // by the netstat command line application, just in .Net strongly-typed object
-            // form.  We will look through the list, and if our port we would like to use
-            // in our TcpClient is occupied, we will set isAvailable to false.
-            IPGlobalProperties ipGlobalProperties = IPGlobalProperties.GetIPGlobalProperties();
-            TcpConnectionInformation[] tcpConnInfoArray = ipGlobalProperties.GetActiveTcpConnections();
-
-            foreach (TcpConnectionInformation tcpi in tcpConnInfoArray)
+            try
             {
-                if (tcpi.LocalEndPoint.Port == port)
+                int port = 443; //<--- This is your value
+                bool isAvailable = true;
+
+                // Evaluate current system tcp connections. This is the same information provided
+                // by the netstat command line application, just in .Net strongly-typed object
+                // form.  We will look through the list, and if our port we would like to use
+                // in our TcpClient is occupied, we will set isAvailable to false.
+                IPGlobalProperties ipGlobalProperties = IPGlobalProperties.GetIPGlobalProperties();
+                TcpConnectionInformation[] tcpConnInfoArray = ipGlobalProperties.GetActiveTcpConnections();
+
+                foreach (TcpConnectionInformation tcpi in tcpConnInfoArray)
                 {
-                    isAvailable = false;
-                    break;
+                    if (tcpi.RemoteEndPoint.Port == port)
+                    {
+                        isAvailable = false;
+                        break;
+                    }
                 }
+                return isAvailable;
             }
-            return isAvailable;
+            catch (Exception ex)
+            {
+                Logger.Error(ex);
+                throw;
+            }
         }
     }
 }

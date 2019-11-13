@@ -1,7 +1,7 @@
 ﻿using Interfaces;
 using Logging;
 using Lumenis.RemoteServiceApi;
-using LumenisRemoteService;
+//using LumenisRemoteService;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -38,6 +38,8 @@ namespace Support_request_app
                 remoteApi = new RemoteAPI();
                 remoteApi.StartClient();
                 _timer.Elapsed += _timer_Elapsed;
+                _timer.Start();
+                Logger.Debug("starting client channel");
             }
             catch (Exception ex)
             {
@@ -49,7 +51,7 @@ namespace Support_request_app
         {
             try
             {
-                Logger.Warning("Failed to cast setting");
+               
                 GetStatuses();//todo should only be performed if user app is active and not minimized
             }
             catch(Exception ex)
@@ -60,6 +62,7 @@ namespace Support_request_app
 
         public void RequestSupport()
         {
+            
             remoteApi.StartScreenConnect();
             var result = remoteApi.GetScreenConnectStatus();
             ServiceStatus = ConvertServiceStatusEnum(result);
@@ -75,12 +78,18 @@ namespace Support_request_app
         {
             var serviceStatusResult = remoteApi.GetScreenConnectStatus();
             var sessionStatusResult = remoteApi.GetSessionStatus();
+           
 
             Application.Current.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Normal, new Action(() =>
             {
                 ServiceStatus = ConvertServiceStatusEnum(serviceStatusResult);
                 SessionStatus = ConvertSessionStatusEnum(sessionStatusResult);
             }));
+
+            if(sessionStatusResult == ScreeenConnectSessionStatus.SessionIsActive)
+            {
+                GetRemainingSessionTime();
+            }
         }
 
         public void RenewSessionLimit()
@@ -91,6 +100,7 @@ namespace Support_request_app
         public void GetRemainingSessionTime()
         {
             var result = remoteApi.GetRemainingTime();
+            Logger.Debug("remaining session time is hours {0}, minutes {1} and seconds {2}",result.TotalHours,result.TotalMinutes,result.TotalSeconds);
             Application.Current.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Normal, new Action(() =>
             {
                 SessionTimeLeft = result;
