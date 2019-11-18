@@ -7,7 +7,7 @@ namespace Limenis.ServiceToken
     {
         static void Main(string[] args)
         {
-            System.Threading.Thread.Sleep(30000);
+            //System.Threading.Thread.Sleep(30000);
             // Parse parameters
             if (args.Length < 1)
             {

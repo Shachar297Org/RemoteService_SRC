@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="C:\Program Files (x86)\InstallShield\2016\Support\0409\buildreport.xsl"?>
+<BuildReport ProductName="Create_Hasp_Script" ProductVersion="1.00.0000" Built="11-17-2019 03-56-23 PM" Config="PROJECT_ASSISTANT" Media="SINGLE_EXE_IMAGE" Uncompressed="0.00 MB">
+  <Features>
+    <Feature Title="##IDS_FEATURE_DISPLAY_NAME1##">Create_Hasp_Script_Files</Feature>
+  </Features>
+  <Components>
+    <Component x64="32">AllOtherFiles</Component>
+  </Components>
+  <Prerequisites />
+  <MergeModules />
+  <DynamicLinks />
+  <Files>
+    <File Destination="{INSTALLDIR} [ProgramFilesFolder]Lumenis\Create_Script" Component="AllOtherFiles" Modified="11/17/2019 12:53:51 PM" Size="262" Version="">Create_hasp_script.bat</File>
+  </Files>
+</BuildReport>

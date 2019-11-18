@@ -26,6 +26,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Interfaces", "Interfaces\In
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Logging", "Logging\Logging.csproj", "{7ACA1D53-53C5-4D82-BC1F-E47F542E2BAE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Script_Create", "Script_Create\Script_Create.csproj", "{BDB7B544-9A3A-4848-8DCB-9084B6BEA0C7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -238,6 +240,30 @@ Global
 		{7ACA1D53-53C5-4D82-BC1F-E47F542E2BAE}.Release|x64.Build.0 = Release|x64
 		{7ACA1D53-53C5-4D82-BC1F-E47F542E2BAE}.Release|x86.ActiveCfg = Release|x86
 		{7ACA1D53-53C5-4D82-BC1F-E47F542E2BAE}.Release|x86.Build.0 = Release|x86
+		{BDB7B544-9A3A-4848-8DCB-9084B6BEA0C7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BDB7B544-9A3A-4848-8DCB-9084B6BEA0C7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BDB7B544-9A3A-4848-8DCB-9084B6BEA0C7}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{BDB7B544-9A3A-4848-8DCB-9084B6BEA0C7}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{BDB7B544-9A3A-4848-8DCB-9084B6BEA0C7}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{BDB7B544-9A3A-4848-8DCB-9084B6BEA0C7}.Debug|x64.Build.0 = Debug|Any CPU
+		{BDB7B544-9A3A-4848-8DCB-9084B6BEA0C7}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{BDB7B544-9A3A-4848-8DCB-9084B6BEA0C7}.Debug|x86.Build.0 = Debug|Any CPU
+		{BDB7B544-9A3A-4848-8DCB-9084B6BEA0C7}.Release_With_logs|Any CPU.ActiveCfg = Release|Any CPU
+		{BDB7B544-9A3A-4848-8DCB-9084B6BEA0C7}.Release_With_logs|Any CPU.Build.0 = Release|Any CPU
+		{BDB7B544-9A3A-4848-8DCB-9084B6BEA0C7}.Release_With_logs|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{BDB7B544-9A3A-4848-8DCB-9084B6BEA0C7}.Release_With_logs|Mixed Platforms.Build.0 = Release|Any CPU
+		{BDB7B544-9A3A-4848-8DCB-9084B6BEA0C7}.Release_With_logs|x64.ActiveCfg = Release|Any CPU
+		{BDB7B544-9A3A-4848-8DCB-9084B6BEA0C7}.Release_With_logs|x64.Build.0 = Release|Any CPU
+		{BDB7B544-9A3A-4848-8DCB-9084B6BEA0C7}.Release_With_logs|x86.ActiveCfg = Release|Any CPU
+		{BDB7B544-9A3A-4848-8DCB-9084B6BEA0C7}.Release_With_logs|x86.Build.0 = Release|Any CPU
+		{BDB7B544-9A3A-4848-8DCB-9084B6BEA0C7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BDB7B544-9A3A-4848-8DCB-9084B6BEA0C7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BDB7B544-9A3A-4848-8DCB-9084B6BEA0C7}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{BDB7B544-9A3A-4848-8DCB-9084B6BEA0C7}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{BDB7B544-9A3A-4848-8DCB-9084B6BEA0C7}.Release|x64.ActiveCfg = Release|Any CPU
+		{BDB7B544-9A3A-4848-8DCB-9084B6BEA0C7}.Release|x64.Build.0 = Release|Any CPU
+		{BDB7B544-9A3A-4848-8DCB-9084B6BEA0C7}.Release|x86.ActiveCfg = Release|Any CPU
+		{BDB7B544-9A3A-4848-8DCB-9084B6BEA0C7}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

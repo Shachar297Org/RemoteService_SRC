@@ -7,13 +7,15 @@ using System.Threading;
 //using Lumenis.RemoteServiceApi.LumenisRemoteService;
 //using LumenisRemoteService;
 using Interfaces;
-using Logging;
+//using Logging;
 
 namespace Lumenis.RemoteServiceApi
 {
+
+
     public partial class RemoteAPI : IDisposable
     {
-        private static readonly ILogger Logger = LoggerFactory.Default.GetCurrentClassLogger();
+        //private static readonly ILogger Logger = LoggerFactory.Default.GetCurrentClassLogger();
         // private RemoteServiceClient _remoteService = null;
         ChannelFactory<IRemoteService> _factory;
         IRemoteService _remoteService;
@@ -26,7 +28,8 @@ namespace Lumenis.RemoteServiceApi
         {
              myBinding = new NetTcpBinding("NetTcpBinding_RemoteService");//NetTcpBinding_RemoteService
              myEndpoint = new EndpointAddress("net.tcp://localhost:49494/RemoteService/ppool");
-            Logger.Debug("end point address is {0}","net.tcp://localhost:49494/RemoteService/ppool");
+            
+           // Logger.Debug("end point address is {0}","net.tcp://localhost:49494/RemoteService/ppool");
         }
 
         public void StartClient()
@@ -37,15 +40,29 @@ namespace Lumenis.RemoteServiceApi
                 _factory = new ChannelFactory<IRemoteService>(myBinding, myEndpoint);
 
                 _remoteService = _factory.CreateChannel();// as RemoteService;
+
+
+                _factory.Faulted += _factory_Faulted;
+                _factory.Closed += _factory_Closed;
+              
+                
             }
             catch (Exception ex)
             {
-                Logger.Error(ex);
+               // Logger.Error(ex);
             }
         }
 
+        private void _factory_Closed(object sender, EventArgs e)
+        {
+           // Logger.Warning("factory closed");
+        }
 
-        
+        private void _factory_Faulted(object sender, EventArgs e)
+        {
+
+           // Logger.Error("factory error");
+        }
 
         public void Open()
         {

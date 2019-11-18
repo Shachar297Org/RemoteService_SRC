@@ -32,6 +32,11 @@
                 <File Id='RemoteServiceConfig' Name='RemoteService.exe.config' DiskId='1' Source='..\RemoteService\bin\Release\RemoteService.exe.config'/>
               <?endif?>
               <File Id='WinSCP' Name='WinSCP.dll' DiskId='1' Source='..\ThirdPartyFiles\WinSCP.dll'/>
+              <File Id='interfaces' Name='interfaces.dll' DiskId='1' Source='..\RemoteService\bin\Debug\Interfaces.dll'/>
+              <File Id='logging' Name='logging.dll' DiskId='1' Source='..\RemoteService\bin\Debug\Logging.dll'/>
+              <File Id='nlog' Name='nlog.dll' DiskId='1' Source='..\RemoteService\bin\Debug\NLog.dll'/>
+              <File Id='nlogConfig' Name='nlogConfig.dll' DiskId='1' Source='..\RemoteService\bin\Debug\NLog.config'/>
+              
 
               <!--return to code-->
               <ServiceInstall Id='RemoteServiceInstall' DisplayName='Lumenis Remote Service' Name='RemoteService' Description='Controlling remote connectivity with Lumenis device' ErrorControl='normal' Start='auto' Type='ownProcess' Vital='yes' />
@@ -48,13 +53,13 @@
               <?endif ?>
             </Component>-->
             
-            <Component Id='RemoteServiceAPIComponent' Guid='C5C61B35-DD44-4FAD-82D5-F2084FF37B99'>
+            <!--<Component Id='RemoteServiceAPIComponent' Guid='C5C61B35-DD44-4FAD-82D5-F2084FF37B99'>
               <?ifdef Debug ?>
                 <File Id='RemoteServiceApiGAC' Name='RemoteServiceApi.dll' Assembly='.net' KeyPath='yes' DiskId='1' Source='..\RemoteServiceClient\bin\Debug\RemoteServiceApi.dll'/>
               <?else?>
                 <File Id='RemoteServiceApiGAC' Name='RemoteServiceApi.dll' Assembly='.net' KeyPath='yes' DiskId='1' Source='..\RemoteServiceClient\bin\Release\RemoteServiceApi.dll'/>
               <?endif?>
-            </Component>
+            </Component>-->
 
           </Directory>
         </Directory>
@@ -65,7 +70,7 @@
       <!-- Default feature -->
       <Feature Id="ProductFeature" AllowAdvertise='no' Display='expand' Level='1' ConfigurableDirectory='INSTALLLOCATION' >
         <ComponentRef Id="ServiceComponent" />
-        <ComponentRef Id="RemoteServiceAPIComponent"/>
+        <!--<ComponentRef Id="RemoteServiceAPIComponent"/>-->
       </Feature>
         
       <!-- Non-default feature -->

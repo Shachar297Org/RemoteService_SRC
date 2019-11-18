@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Logging;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -9,6 +10,7 @@ namespace LumenisRemoteService
 {
     class LumenisRemoteServiceApp
     {
+        private static readonly ILogger Logger = LoggerFactory.Default.GetCurrentClassLogger();
         private static ServiceHost _host = null;
         private const string LOG = "Application";
        // private static string _serviceName;
@@ -34,12 +36,15 @@ namespace LumenisRemoteService
                 // Create the ServiceHost.
                 _host = new ServiceHost(typeof(RemoteService));
                 _host.Open();
+                Logger.Information("service host started");
 
-              
+
+
 
             }
             catch (Exception ex)
             {
+                Logger.Error(ex);
                 // EventLog.WriteEntry(ServiceName, string.Format("OnStart Exception: {0}", ex.ToString()), EventLogEntryType.Error);
             }
         }

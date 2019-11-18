@@ -1,4 +1,5 @@
 ﻿using Interfaces;
+using Logging;
 using System.Runtime.Serialization;
 using System.ServiceModel;
 
@@ -55,7 +56,7 @@ namespace LumenisRemoteService
     //    [OperationContract]
 
     //    string GetScreenConnectStatus();
-       
+
 
     //    #endregion
 
@@ -70,7 +71,7 @@ namespace LumenisRemoteService
     //    public bool IsEnabled;
     //}
 
-   // [ServiceContract]
+    [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single)]
     public partial class RemoteService:IRemoteService
     {
         public RemoteStatus GetStatus()
@@ -101,6 +102,7 @@ namespace LumenisRemoteService
 
         public void CreateFeature(int featureId)
         {
+            Logger.Information("CreateFeature command received");
             ServiceToken.Instance().Create(featureId);
         }
 
@@ -117,6 +119,7 @@ namespace LumenisRemoteService
        // [OperationContract]
         public void RemoveFeature(int featureId)
         {
+            Logger.Information("RemoveFeature command received");
             ServiceToken.Instance().Remove(featureId);
         }
 

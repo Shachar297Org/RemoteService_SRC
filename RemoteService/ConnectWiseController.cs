@@ -35,8 +35,14 @@ namespace LumenisRemoteService
         private System.Diagnostics.Stopwatch _sessionWatch = new System.Diagnostics.Stopwatch();
         private System.Timers.Timer _timer;
         private System.Timers.Timer _sessionReadyLimittimer;// restrict the time frame which the device can be exposed and be ready to session connection
+        private System.Timers.Timer _inactivityTimer;
+
         private readonly double MONITORINTERVAL = new TimeSpan(0, 0, 10).TotalMilliseconds;
         private readonly double SESSIONLIMITINTERVAL = new TimeSpan(0, 5, 0).TotalMilliseconds;
+        private readonly double AppInactivityINTERVAL = new TimeSpan(0, 1, 0).TotalMilliseconds;
+
+        private TimeSpan _sessionTimeLeft;
+        private  TimeSpan _SESSIONTIMESPAN = new TimeSpan(0,5,0);
 
         public ScreeenConnectServiceStatus ServiceStatus { get; private set; } = ScreeenConnectServiceStatus.None;
         public ScreeenConnectSessionStatus SessionStatus { get; private set; } = ScreeenConnectSessionStatus.None;
@@ -56,6 +62,10 @@ namespace LumenisRemoteService
 
                 _sessionReadyLimittimer = new System.Timers.Timer(SESSIONLIMITINTERVAL);
                 _sessionReadyLimittimer.Elapsed += _sessionReadyLimittimer_Elapsed;
+
+
+                _inactivityTimer = new System.Timers.Timer(AppInactivityINTERVAL);
+                _inactivityTimer.Elapsed += _inactivityTimer_Elapsed;
 
 
                 //ServiceController[] _services = ServiceController.GetServices();
@@ -85,10 +95,20 @@ namespace LumenisRemoteService
 
         }
 
+        private void _inactivityTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        {
+            
+            lock (_syncObj)
+            {
+                _userAppIsRunning = false; 
+            }
+        }
+
         private void _sessionReadyLimittimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
             try
             {
+                _sessionWatch.Stop();
                 _sessionReadyLimittimer.Stop();
                 Logger.Debug("session reached to it's limit");
                 lock (_syncObj)
@@ -96,6 +116,7 @@ namespace LumenisRemoteService
                     _requestForSupportWasMade = false;// will terminate Screen connect service 
                 }
                 _sessionReadyLimittimer.Start();
+                _sessionWatch.Start();
             }
             catch( Exception ex)
             {
@@ -117,10 +138,18 @@ namespace LumenisRemoteService
                 {
                     lock (_syncObj)
                     {
-                        SessionStatus = ScreeenConnectSessionStatus.SessionIsActive; 
+                        SessionStatus = ScreeenConnectSessionStatus.SessionInStandby; 
                     }
                 }
-               
+                TimeSpan ts = _SESSIONTIMESPAN - _sessionWatch.Elapsed;
+                if(ts.TotalMilliseconds <=0)
+                {
+                    _sessionTimeLeft = new TimeSpan(0,0,0);
+                }
+                else
+                {
+                    _sessionTimeLeft = ts;
+                }
             }
             catch (Exception ex)
             {
@@ -163,13 +192,15 @@ namespace LumenisRemoteService
             {
                 if (_service != null && _service.Status == ServiceControllerStatus.Paused || _service.Status == ServiceControllerStatus.Stopped)
                 {
-                    Logger.Debug("starting service");
+                    Logger.Debug("starting ScreenConnect service");
                     _service.Start();
                     lock (_syncObj)
                     {
                         _requestForSupportWasMade = true; 
                     }
+                    _sessionTimeLeft = _SESSIONTIMESPAN;
                     _sessionReadyLimittimer.Start();
+                    _sessionWatch.Start();
                     //System.Threading.Thread.Sleep(10000);
                     return true;
                 }
@@ -190,25 +221,31 @@ namespace LumenisRemoteService
 
         public void RenewSessionTimer()
         {
-            if(SessionStatus == ScreeenConnectSessionStatus.SessionInStandby || SessionStatus == ScreeenConnectSessionStatus.SessionIsActive)
+            if(SessionStatus == ScreeenConnectSessionStatus.SessionIsActive)
             {
                 lock (_syncObj)
                 {
-                    _requestForSupportWasMade = true; 
+                    _requestForSupportWasMade = true;
+                    _sessionReadyLimittimer.Start();
+                    TimeSpan ts = _sessionWatch.Elapsed;
+                    Logger.Debug("session timer elapsed time when renewing session is hors {1}, minutes {1} and seconds {2}", ts.TotalHours, ts.TotalMinutes, ts.TotalSeconds);
+                    _sessionWatch.Reset();
+                    _sessionWatch.Start();
+                    _sessionTimeLeft = _SESSIONTIMESPAN;
                 }
-                _sessionReadyLimittimer.Start();
-                TimeSpan ts = _sessionWatch.Elapsed;
-                Logger.Debug("session timer elapsed time when renewing session is hors {1}, minutes {1} and seconds {2}",ts.TotalHours,ts.TotalMinutes,ts.TotalSeconds);
-                _sessionWatch.Reset();
-                _sessionWatch.Start();
+               
             }
+            else
+            {
+                _sessionTimeLeft = new TimeSpan(0, 0, 0);
+            }
+
           
         }
 
         public TimeSpan SessionTimeLeft()
         {
-           return _sessionWatch.Elapsed;
-            
+            return _sessionTimeLeft;
         }
 
         /// <summary>
@@ -311,7 +348,6 @@ namespace LumenisRemoteService
                     }
                     // Logger.Debug("user app flag is pulled to false");
 
-                    _userAppIsRunning = false; // set the user app activity flag to false 
                 }
             }
             catch (Exception ex)
@@ -328,6 +364,11 @@ namespace LumenisRemoteService
             lock (_syncObj)
             {
                 //Logger.Debug("user app flag is pulled to true");
+                if (ServiceStatus == ScreeenConnectServiceStatus.Running)
+                {
+                    _inactivityTimer.Stop();
+                    _inactivityTimer.Start();//reset the inactivity timer 
+                }
                 _userAppIsRunning = true;
             }
         }
