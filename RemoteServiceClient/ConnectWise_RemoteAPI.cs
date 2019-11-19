@@ -30,15 +30,15 @@ namespace Lumenis.RemoteServiceApi
             return _remoteService.GetSessiontStatus();
         }
 
-        public void RenewSessionLimit()
-        {
-             _remoteService.RenewSessionLimit();
-        }
+        //public void RenewSessionLimit()
+        //{
+        //     _remoteService.RenewSessionLimit();
+        //}
 
-        public TimeSpan GetRemainingTime()
-        {
-            return _remoteService.SessionTimeLeft();
-        }
+        //public TimeSpan GetRemainingTime()
+        //{
+        //    return _remoteService.SessionTimeLeft();
+        //}
 
     }
     

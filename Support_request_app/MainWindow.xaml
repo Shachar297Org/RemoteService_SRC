@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:Support_request_app"
        
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="250">
+        Title="MainWindow" Height="250" Width="250">
     <Grid>
         <local:requestControl>
 

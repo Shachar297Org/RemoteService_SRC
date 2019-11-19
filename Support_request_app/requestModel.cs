@@ -51,7 +51,6 @@ namespace Support_request_app
         {
             try
             {
-               
                 GetStatuses();//todo should only be performed if user app is active and not minimized
             }
             catch(Exception ex)
@@ -86,26 +85,26 @@ namespace Support_request_app
                 SessionStatus = ConvertSessionStatusEnum(sessionStatusResult);
             }));
 
-            if(sessionStatusResult == ScreeenConnectSessionStatus.SessionIsActive)
-            {
-                GetRemainingSessionTime();
-            }
+            //if(sessionStatusResult == ScreeenConnectSessionStatus.SessionIsActive)
+            //{
+            //    GetRemainingSessionTime();
+            //}
         }
 
         public void RenewSessionLimit()
         {
-            remoteApi.RenewSessionLimit();
+           // remoteApi.RenewSessionLimit();
         }
 
-        public void GetRemainingSessionTime()
-        {
-            var result = remoteApi.GetRemainingTime();
-            Logger.Debug("remaining session time is hours {0}, minutes {1} and seconds {2}",result.TotalHours,result.TotalMinutes,result.TotalSeconds);
-            Application.Current.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Normal, new Action(() =>
-            {
-                SessionTimeLeft = result;
-            }));
-        }
+        //public void GetRemainingSessionTime()
+        //{
+        //    var result = remoteApi.GetRemainingTime();
+        //    Logger.Debug("remaining session time is hours {0}, minutes {1} and seconds {2}",result.TotalHours,result.TotalMinutes,result.TotalSeconds);
+        //    Application.Current.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Normal, new Action(() =>
+        //    {
+        //        SessionTimeLeft = result;
+        //    }));
+        //}
 
         
 
@@ -150,6 +149,7 @@ namespace Support_request_app
                 case ScreeenConnectSessionStatus.CableDisconnected: return "Cable is disconnected";
                 case ScreeenConnectSessionStatus.SessionInStandby: return "Session in standby";
                 case ScreeenConnectSessionStatus.SessionIsActive: return "Session is active";
+                case ScreeenConnectSessionStatus.SessionDisconnected: return "Session disconnected";
                 default: return "Unknown";
             }
         }

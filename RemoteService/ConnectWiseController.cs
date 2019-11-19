@@ -22,7 +22,8 @@ namespace LumenisRemoteService
         private ServiceController _service = null;
         private bool _serviceInstalled = false;
         private bool _requestForSupportWasMade = false; //signal if the user app sent request for support
-        private bool _userAppIsRunning = false;
+                                                        // private bool _userAppIsRunning = false;
+        private bool _sessionWasActiveOnce;// check if session took place
         private object _syncObj = new object();
 
         #region Session monitoring flag
@@ -32,17 +33,21 @@ namespace LumenisRemoteService
 
         #endregion
 
-        private System.Diagnostics.Stopwatch _sessionWatch = new System.Diagnostics.Stopwatch();
+       // private System.Diagnostics.Stopwatch _sessionWatch = new System.Diagnostics.Stopwatch();
         private System.Timers.Timer _timer;
-        private System.Timers.Timer _sessionReadyLimittimer;// restrict the time frame which the device can be exposed and be ready to session connection
-        private System.Timers.Timer _inactivityTimer;
+        // private System.Timers.Timer _sessionReadyLimittimer;// restrict the time frame which the device can be exposed and be ready to session connection
+        // private System.Timers.Timer _inactivityTimer;
+
+        private System.Timers.Timer _trafficMonitoringTimer;
+       
 
         private readonly double MONITORINTERVAL = new TimeSpan(0, 0, 10).TotalMilliseconds;
         private readonly double SESSIONLIMITINTERVAL = new TimeSpan(0, 5, 0).TotalMilliseconds;
-        private readonly double AppInactivityINTERVAL = new TimeSpan(0, 1, 0).TotalMilliseconds;
+        private readonly double TRAFFICMONITORINGINTERVAL = new TimeSpan(0, 0, 40).TotalMilliseconds;
+        //private readonly double AppInactivityINTERVAL = new TimeSpan(0, 1, 0).TotalMilliseconds;
 
-        private TimeSpan _sessionTimeLeft;
-        private  TimeSpan _SESSIONTIMESPAN = new TimeSpan(0,5,0);
+        //private TimeSpan _sessionTimeLeft;
+        //private  TimeSpan _SESSIONTIMESPAN = new TimeSpan(0,5,0);
 
         public ScreeenConnectServiceStatus ServiceStatus { get; private set; } = ScreeenConnectServiceStatus.None;
         public ScreeenConnectSessionStatus SessionStatus { get; private set; } = ScreeenConnectSessionStatus.None;
@@ -60,12 +65,15 @@ namespace LumenisRemoteService
                 _timer.Elapsed += _timer_Elapsed;
                 _timer.Start();
 
-                _sessionReadyLimittimer = new System.Timers.Timer(SESSIONLIMITINTERVAL);
-                _sessionReadyLimittimer.Elapsed += _sessionReadyLimittimer_Elapsed;
+                _trafficMonitoringTimer = new System.Timers.Timer(MONITORINTERVAL);
+                _trafficMonitoringTimer.Elapsed += _trafficMonitoringTimer_Elapsed;
+
+                //  _sessionReadyLimittimer = new System.Timers.Timer(SESSIONLIMITINTERVAL);
+                //  _sessionReadyLimittimer.Elapsed += _sessionReadyLimittimer_Elapsed;
 
 
-                _inactivityTimer = new System.Timers.Timer(AppInactivityINTERVAL);
-                _inactivityTimer.Elapsed += _inactivityTimer_Elapsed;
+                // _inactivityTimer = new System.Timers.Timer(AppInactivityINTERVAL);
+                // _inactivityTimer.Elapsed += _inactivityTimer_Elapsed;
 
 
                 //ServiceController[] _services = ServiceController.GetServices();
@@ -95,34 +103,73 @@ namespace LumenisRemoteService
 
         }
 
-        private void _inactivityTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        int _counter = 1;
+        int _maxCounter = 3;
+        private void _trafficMonitoringTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
-            
-            lock (_syncObj)
+            if (NetworkHelper.TrafficDetected)
             {
-                _userAppIsRunning = false; 
+                NetworkHelper.TrafficDetected = false;
+                lock (_syncObj)
+                {
+                    SessionStatus = ScreeenConnectSessionStatus.SessionIsActive;
+                    _counter = 1;
+                }
+
+            }
+            else
+            {
+                if (_counter < _maxCounter)
+                {
+                    lock (_syncObj)
+                    {
+                        SessionStatus = ScreeenConnectSessionStatus.SessionInStandby;
+                        _counter++; 
+                    }
+                }
+                else
+                {
+                    // thereis no traffic between client and server
+                    Logger.Debug("closing service because of traffic inactivity. inactivity counter is {0}", _counter);
+                    lock (_syncObj)
+                    {
+                        SessionStatus = ScreeenConnectSessionStatus.SessionDisconnected;
+                        _counter = 1; 
+                    }
+                    Close();
+                    
+                }
             }
         }
 
-        private void _sessionReadyLimittimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
-        {
-            try
-            {
-                _sessionWatch.Stop();
-                _sessionReadyLimittimer.Stop();
-                Logger.Debug("session reached to it's limit");
-                lock (_syncObj)
-                {
-                    _requestForSupportWasMade = false;// will terminate Screen connect service 
-                }
-                _sessionReadyLimittimer.Start();
-                _sessionWatch.Start();
-            }
-            catch( Exception ex)
-            {
-                Logger.Error(ex);
-            }
-        }
+        //private void _inactivityTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        //{
+
+        //    lock (_syncObj)
+        //    {
+        //        _userAppIsRunning = false; 
+        //    }
+        //}
+
+        //private void _sessionReadyLimittimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        //{
+        //    try
+        //    {
+        //        _sessionWatch.Stop();
+        //        _sessionReadyLimittimer.Stop();
+        //        Logger.Debug("session reached to it's limit");
+        //        lock (_syncObj)
+        //        {
+        //            _requestForSupportWasMade = false;// will terminate Screen connect service 
+        //        }
+        //        _sessionReadyLimittimer.Start();
+        //        _sessionWatch.Start();
+        //    }
+        //    catch( Exception ex)
+        //    {
+        //        Logger.Error(ex);
+        //    }
+        //}
 
         private void _timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
@@ -134,22 +181,22 @@ namespace LumenisRemoteService
                 {
                     MonitorSession(); 
                 }
-                else
-                {
-                    lock (_syncObj)
-                    {
-                        SessionStatus = ScreeenConnectSessionStatus.SessionInStandby; 
-                    }
-                }
-                TimeSpan ts = _SESSIONTIMESPAN - _sessionWatch.Elapsed;
-                if(ts.TotalMilliseconds <=0)
-                {
-                    _sessionTimeLeft = new TimeSpan(0,0,0);
-                }
-                else
-                {
-                    _sessionTimeLeft = ts;
-                }
+                //else
+                //{
+                //    lock (_syncObj)
+                //    {
+                //        SessionStatus = ScreeenConnectSessionStatus.SessionInStandby; 
+                //    }
+                //}
+               // TimeSpan ts = _SESSIONTIMESPAN - _sessionWatch.Elapsed;
+                //if(ts.TotalMilliseconds <=0)
+                //{
+                //    _sessionTimeLeft = new TimeSpan(0,0,0);
+                //}
+                //else
+                //{
+                //    _sessionTimeLeft = ts;
+                //}
             }
             catch (Exception ex)
             {
@@ -193,15 +240,18 @@ namespace LumenisRemoteService
                 if (_service != null && _service.Status == ServiceControllerStatus.Paused || _service.Status == ServiceControllerStatus.Stopped)
                 {
                     Logger.Debug("starting ScreenConnect service");
-                    _service.Start();
+                    _service.Start();//user case 1
+                    NetworkHelper._activated = false;
+                    _sessionWasActiveOnce = false;//reset the flag each time user request support or stop the service
                     lock (_syncObj)
                     {
                         _requestForSupportWasMade = true; 
                     }
-                    _sessionTimeLeft = _SESSIONTIMESPAN;
-                    _sessionReadyLimittimer.Start();
-                    _sessionWatch.Start();
+                    // _sessionTimeLeft = _SESSIONTIMESPAN;
+                    // _sessionReadyLimittimer.Start();
+                    //_sessionWatch.Start();
                     //System.Threading.Thread.Sleep(10000);
+                    _trafficMonitoringTimer.Start();
                     return true;
                 }
                 else // if service status is other than the both above
@@ -219,34 +269,34 @@ namespace LumenisRemoteService
             
         }
 
-        public void RenewSessionTimer()
-        {
-            if(SessionStatus == ScreeenConnectSessionStatus.SessionIsActive)
-            {
-                lock (_syncObj)
-                {
-                    _requestForSupportWasMade = true;
-                    _sessionReadyLimittimer.Start();
-                    TimeSpan ts = _sessionWatch.Elapsed;
-                    Logger.Debug("session timer elapsed time when renewing session is hors {1}, minutes {1} and seconds {2}", ts.TotalHours, ts.TotalMinutes, ts.TotalSeconds);
-                    _sessionWatch.Reset();
-                    _sessionWatch.Start();
-                    _sessionTimeLeft = _SESSIONTIMESPAN;
-                }
+        //public void RenewSessionTimer()
+        //{
+        //    if(SessionStatus == ScreeenConnectSessionStatus.SessionIsActive)
+        //    {
+        //        lock (_syncObj)
+        //        {
+        //            _requestForSupportWasMade = true;
+        //            _sessionReadyLimittimer.Start();
+        //            TimeSpan ts = _sessionWatch.Elapsed;
+        //            Logger.Debug("session timer elapsed time when renewing session is hors {1}, minutes {1} and seconds {2}", ts.TotalHours, ts.TotalMinutes, ts.TotalSeconds);
+        //            _sessionWatch.Reset();
+        //            _sessionWatch.Start();
+        //            _sessionTimeLeft = _SESSIONTIMESPAN;
+        //        }
                
-            }
-            else
-            {
-                _sessionTimeLeft = new TimeSpan(0, 0, 0);
-            }
+        //    }
+        //    else
+        //    {
+        //        _sessionTimeLeft = new TimeSpan(0, 0, 0);
+        //    }
 
           
-        }
+        //}
 
-        public TimeSpan SessionTimeLeft()
-        {
-            return _sessionTimeLeft;
-        }
+        //public TimeSpan SessionTimeLeft()
+        //{
+        //    return _sessionTimeLeft;
+        //}
 
         /// <summary>
         /// stop screen connect service id exist
@@ -263,8 +313,9 @@ namespace LumenisRemoteService
                     {
                         _requestForSupportWasMade = false; 
                     }
-                    _sessionReadyLimittimer.Stop();
-                    _service.Stop();
+                    //_sessionReadyLimittimer.Stop();
+                    _service.Stop();//user case 3
+                    _sessionWasActiveOnce = false;//reset the flag each time user request support or stop the service
                     //System.Threading.Thread.Sleep(10000);
                     return true;
                 }
@@ -303,9 +354,9 @@ namespace LumenisRemoteService
 
                         if (_service.Status == ServiceControllerStatus.Running)
                         {
-                            if (!_requestForSupportWasMade || !_userAppIsRunning)// if the service is running (online on dashboard) but no request for support was made. or if user app is down
+                            if (!_requestForSupportWasMade)// if the service is running (online on dashboard) but no request for support was made. or if user app is down
                             {
-                                Logger.Debug("stopping service because request support time frame was over or because user app not running. request flag {0} , user app flag {1}", _requestForSupportWasMade, _userAppIsRunning);
+                                Logger.Debug("stopping service because request support time frame was over or because user app not running. request flag {0}", _requestForSupportWasMade);
                                 Close();
                                 System.Threading.Thread.Sleep(5000);
                                 return;//wait of the next timer tick
@@ -358,20 +409,20 @@ namespace LumenisRemoteService
 
        
 
-        internal void UserAppISActive()
-        {
+        //internal void UserAppISActive()
+        //{
 
-            lock (_syncObj)
-            {
-                //Logger.Debug("user app flag is pulled to true");
-                if (ServiceStatus == ScreeenConnectServiceStatus.Running)
-                {
-                    _inactivityTimer.Stop();
-                    _inactivityTimer.Start();//reset the inactivity timer 
-                }
-                _userAppIsRunning = true;
-            }
-        }
+        //    lock (_syncObj)
+        //    {
+        //        //Logger.Debug("user app flag is pulled to true");
+        //        if (ServiceStatus == ScreeenConnectServiceStatus.Running)
+        //        {
+        //            _inactivityTimer.Stop();
+        //            _inactivityTimer.Start();//reset the inactivity timer 
+        //        }
+        //        _userAppIsRunning = true;
+        //    }
+        //}
 
         #region Session monitoring
 
@@ -392,19 +443,38 @@ namespace LumenisRemoteService
                 if (_receivedIp)//check if port 443 is in used
                 {
                     _isPortOpened = NetworkHelper.CheckIfSessionEstablished();
-                    if (!_isPortOpened)
-                    {
-                        SessionStatus = ScreeenConnectSessionStatus.SessionIsActive;
-                    }
-                    else
-                    {
-                        SessionStatus = ScreeenConnectSessionStatus.SessionInStandby;
-                    }
+                    //if (!_isPortOpened)
+                    //{
+                        
+                    //    SessionStatus = ScreeenConnectSessionStatus.SessionIsActive;
+                    //    _sessionWasActiveOnce = true;
+                       
+                    //}
+                    //else
+                    //{
+                    //    SessionStatus = ScreeenConnectSessionStatus.SessionInStandby;
+                    //    if(_sessionWasActiveOnce)
+                    //    {
+                    //        Close();
+                    //        Logger.Debug("service is closed because session in standby status and it was active before.");// use case 2
+                    //    }
+                    //}
                 }
                 else
                 {
                     SessionStatus = ScreeenConnectSessionStatus.CableDisconnected;
                 }
+
+                //if(SessionStatus == ScreeenConnectSessionStatus.SessionIsActive)
+                //{
+                //    _trafficMonitoringTimer.Start();
+                //    Logger.Debug("starting monitor traffic timer");
+                //}
+                //else
+                //{
+                //    _trafficMonitoringTimer.Stop();
+                //    Logger.Debug("stopping monitor traffic timer");
+                //}
 
                 Logger.Debug("session status is {0}", SessionStatus);
             }

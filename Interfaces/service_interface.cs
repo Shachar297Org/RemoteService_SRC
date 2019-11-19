@@ -33,7 +33,9 @@ namespace Interfaces
         [EnumMember]
         SessionInStandby,
         [EnumMember]
-        SessionIsActive
+        SessionIsActive,
+        [EnumMember]
+        SessionDisconnected
     }
 
     [DataContract]
@@ -100,11 +102,11 @@ namespace Interfaces
         [OperationContract]
         ScreeenConnectSessionStatus GetSessiontStatus();
 
-        [OperationContract]
-        void RenewSessionLimit();
+        //[OperationContract]
+        //void RenewSessionLimit();
 
-        [OperationContract]
-        TimeSpan SessionTimeLeft();
+        //[OperationContract]
+        //TimeSpan SessionTimeLeft();
 
 
         #endregion

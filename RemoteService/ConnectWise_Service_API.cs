@@ -47,7 +47,7 @@ namespace LumenisRemoteService
         public ScreeenConnectServiceStatus GetScreenConnectStatus()
         {
             Logger.Debug("GetScreenConnectStatus");
-            _wiseControl.UserAppISActive();
+           // _wiseControl.UserAppISActive();
             return _wiseControl.ServiceStatus;
         }
 
@@ -57,18 +57,18 @@ namespace LumenisRemoteService
         }
 
        
-        public void RenewSessionLimit()
-        {
-            Logger.Debug("RenewSessionLimit");
-            _wiseControl.RenewSessionTimer();
-        }
+        //public void RenewSessionLimit()
+        //{
+        //    Logger.Debug("RenewSessionLimit");
+        //    _wiseControl.RenewSessionTimer();
+        //}
 
        
-        public TimeSpan SessionTimeLeft()
-        {
-            Logger.Debug("SessionTimeLeft");
-            return _wiseControl.SessionTimeLeft();
-        }
+        //public TimeSpan SessionTimeLeft()
+        //{
+        //    Logger.Debug("SessionTimeLeft");
+        //    return _wiseControl.SessionTimeLeft();
+        //}
 
 
     }

@@ -37,6 +37,9 @@ namespace LumenisRemoteService
                 _host = new ServiceHost(typeof(RemoteService));
                 _host.Open();
                 Logger.Information("service host started");
+                System.Threading.Thread.Sleep(5000);
+                ServiceClient client = new ServiceClient();//start internal WCF client which make sure remote service will trun off ScreenConnect service
+               
 
 
 
