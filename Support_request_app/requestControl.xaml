@@ -18,8 +18,8 @@
         <StackPanel>
             <Button Content="Invite Support" Click="Invite_click" Margin="0,10,0,0"/>
             <Button Content="Stop Support" Click="Stop_Click" Margin="0,10,0,0"/>
-            <TextBlock Text="Service Status" Margin="0,10,0,0"/>
-            <TextBox Text="{Binding RequestSupport.ServiceStatus,ElementName=req_elem}" Margin="0,10,0,0"/>
+            <!--<TextBlock Text="Service Status" Margin="0,10,0,0"/>
+            <TextBox Text="{Binding RequestSupport.ServiceStatus,ElementName=req_elem}" Margin="0,10,0,0"/>-->
             <TextBlock Text="Session Status" Margin="0,10,0,0"/>
             <TextBox Text="{Binding RequestSupport.SessionStatus,ElementName=req_elem}" Margin="0,10,0,0"/>
             <!--<Button Content="Reset SessionTime" Click="ResetSessionTime_Click" Margin="0,10,0,0"/>

@@ -18,7 +18,9 @@ namespace LumenisRemoteService
             try
             {
                 remoteApi = new RemoteAPI();
-                remoteApi.StartClient();
+                //remoteApi.StartClient();
+                remoteApi.Open();
+               
                 remoteApi.StopScreenConnect();
                 Logger.Information("internal client stop ScreenConnect service");//user case 3
             }

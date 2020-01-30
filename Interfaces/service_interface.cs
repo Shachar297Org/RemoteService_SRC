@@ -50,6 +50,9 @@ namespace Interfaces
     [ServiceContract]
     public interface IRemoteService
     {
+        //[OperationContract]
+        //void Open();
+
         [OperationContract]
         RemoteStatus GetStatus();
 

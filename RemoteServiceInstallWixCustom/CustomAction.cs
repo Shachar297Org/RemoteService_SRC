@@ -16,52 +16,92 @@ namespace RemoteServiceInstallWixCustom
 {
     public class CustomActions
     {
-        private const string VOLUME = @"\\?\GLOBALROOT\Device\HarddiskVolume1";
-        const string INSTALL_DIR = @"D:\Program Files\Lumenis\";
-        const string TEMP_APP_DIR = "LSI.tmp";
-        
+        // private const string VOLUME = @"\\?\GLOBALROOT\Device\HarddiskVolume1";
+        // const string INSTALL_DIR = @"D:\Program Files\Lumenis\";
+        // const string TEMP_APP_DIR = "LSI.tmp";
+        //[CustomAction]
+        //public static ActionResult CopyToX86Folder(Session session)
+        //{
+        //    try
+        //    {
+        //        if (!System.IO.Directory.Exists(@"D:\Program Files\Lumenis\Remote Service\x86"))
+        //        {
+
+        //            System.IO.Directory.CreateDirectory(@"D:\Program Files\Lumenis\Remote Service\x86");
+        //        }
+
+        //        if (!System.IO.File.Exists(@"D:\Program Files\Lumenis\Remote Service\x86\KernelTraceControl.dll"))
+        //        {
+        //            //copy
+        //            System.IO.File.Copy(@"D:\Program Files\Lumenis\Remote Service\KernelTraceControl.dll", @"D:\Program Files\Lumenis\Remote Service\x86\KernelTraceControl.dll");
+        //            System.IO.File.Copy(@"D:\Program Files\Lumenis\Remote Service\KernelTraceControl.Win61.dll", @"D:\Program Files\Lumenis\Remote Service\x86\KernelTraceControl.Win61.dll");
+        //            System.IO.File.Copy(@"D:\Program Files\Lumenis\Remote Service\msdia140.dll", @"D:\Program Files\Lumenis\Remote Service\x86\msdia140.dll");
+        //        }
+        //        return ActionResult.Success;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return ActionResult.Success;
+        //    }
+        //}
+
         [CustomAction]
-        public static ActionResult CheckPrerequisites(Session session)
+        public static ActionResult CheckPrerequisites(Session session )
         {
+
+            //session["HASP_INSERTED"] = "1";
+            //session["IMAGE_VERSION_OK"] = "1";
+            //return ActionResult.Success;
+
             session.Log("Begin CheckPrerequisites");
-            LogRecord("Begin CheckPrerequisites", session);
-            
-            if (UwfApi.IsUwfEnabled())
-            {
-                session.Log("Disabling UWF...");
-                TurnUWFOff();
-                return ActionResult.SkipRemainingActions;
-            }
+            //LogRecord("Begin CheckPrerequisites", session);
 
-            // THIS VERSION DOES NOT INCLUDE BOMGAR SO IT IS CLOSED
-            //if (IsBomgarInstalled())
+            //if (UwfApi.IsUwfEnabled())//doesn't work at all on WIN7
             //{
-            //    session["BOMGAR_INSTALLED"] = "1";
-            //    session["CONNECTION_OK"] = "2";
-            //}
-            //else
-            //{
-            //    session["BOMGAR_INSTALLED"] = "0";
-            //    session["CONNECTION_OK"] = ConnectionAvailable("https://support.lumenis.com") ? "1" : "0";
+            //    session.Log("Disabling UWF...");
+            //    TurnUWFOff();
+            //    return ActionResult.SkipRemainingActions;
             //}
 
-            if (CheckHasp())
+
+
+            if (CheckHasp(session))
             {
+
                 session["HASP_INSERTED"] = "1";
-                session["COMPUTER_NAME"] = BuildComputerName();
+                //session.Log("Hasp OK");
+                string compName = BuildComputerName();
+                session["COMPUTER_NAME"] = compName;
+               // session.Log(string.Format("Comp Name is {0}", compName));
+                
             }
             else
             {
+                session.Log("Hasp Failed");
                 session["HASP_INSERTED"] = "0";
                 session["COMPUTER_NAME"] = "";
+               
             }
+
+
+            //session["HASP_INSERTED"] = "1";
+            //session["COMPUTER_NAME"] = "Test";
+
 
             string version;
             string versionCheck;
-            CheckImageVersion(out version, out versionCheck);
+            CheckImageVersion(session, out version, out versionCheck);
             session["IMAGE_VERSION"] = version;
             session["IMAGE_VERSION_OK"] = versionCheck;
             session["PREREQ_FINISHED"] = "1";
+
+            //session["IMAGE_VERSION"] = "1.1.1";
+            //session["IMAGE_VERSION_OK"] = "1";
+           // session["HASP_INSERTED"] = "1";
+            //session["PREREQ_FINISHED"] = "1";
+           
+
+
 
             return ActionResult.Success;
         }
@@ -104,10 +144,27 @@ namespace RemoteServiceInstallWixCustom
                 subkey.SetValue("RemoteServiceInstallation", fullName);
             }
         }
+        //[CustomAction]
+        //public static ActionResult RegisterComponents(Session session)
+        //{
+        //    try
+        //    {
+        //        RegisterToGAC();
 
+        //        RegisterCom();
+
+        //        return ActionResult.Success;
+        //    }
+        //    catch
+        //    {
+
+        //        return ActionResult.Failure;
+        //    }
+        //}
         [CustomAction]
         public static ActionResult ChangeComputerName(Session session)
         {
+           
             string currentComputerName = Environment.GetEnvironmentVariable("COMPUTER_NAME");
             string newComputerName = session["COMPUTER_NAME"];
             if (string.IsNullOrEmpty(currentComputerName) ||
@@ -147,7 +204,7 @@ namespace RemoteServiceInstallWixCustom
         
         private static void LogRecord(string message, Session session, InstallMessage installMessage = InstallMessage.Info)
         {
-            session.Message(installMessage, new Record() { FormatString = message });
+            session?.Message(installMessage, new Record() { FormatString = message });
         }
 
         // THIS VERSION DOES NOT INCLUDE BOMGAR SO IT IS CLOSED
@@ -178,19 +235,22 @@ namespace RemoteServiceInstallWixCustom
         //    }
         //}
 
-        private static bool CheckHasp()
+        private static bool CheckHasp(Session session)
         {
             try
             {
                 SecurityKey securityKey = new SecurityKey();
                 if (!securityKey.UseFeature(SecurityKey.MAIN_FEATURE_ID))
                 {
+                  //  session["COMPUTER_NAME"] = "false";
                     return false;
                 }
+               // session["COMPUTER_NAME"] = "true";
                 return true;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+               // session["COMPUTER_NAME"] = ex.Message;
                 return false;
             }
         }
@@ -211,11 +271,11 @@ namespace RemoteServiceInstallWixCustom
             }
         }
 
-        private static void CheckImageVersion(out string version, out string versionCheck)
+        private static void CheckImageVersion(Session session,out string version, out string versionCheck)
         {
             // versionCheck = "0";
             versionCheck = "1"; // Ignore version check on Windows 10
-
+            session.Log("Check image version");
             try
             {
                 object ver = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64).
@@ -245,7 +305,49 @@ namespace RemoteServiceInstallWixCustom
             {
                 version = "Not set";
             }
+            session.Log(string.Format("checked version is {0}",version));
         }
+
+        /// <summary>
+        /// Register COM dll as COM object 
+        /// </summary>
+        private static void RegisterCom()
+        {
+            try
+            {
+
+            }
+            catch
+            {
+
+
+            }
+        }
+
+        private static void RegisterToGAC()
+        {
+            try
+            {
+                //System.EnterpriseServices.Internal.Publish gg = new Publish();
+                //  gg.GacInstall("NLog.dll");
+                //gg.GacRemove("NLog.dll");
+                //gg.GacRemove("COM.dll");
+                //gg.GacRemove("Interfaces.dll");
+                //gg.GacRemove("Logging.dll");
+                //gg.GacRemove("RemoteServiceApi.dll");
+                //gg.GacInstall("NLog.dll");
+                //gg.GacInstall("COM.dll");
+                //gg.GacInstall("Interfaces.dll");
+                //gg.GacInstall("Logging.dll");
+                //gg.GacInstall("RemoteServiceApi.dll");
+            }
+            catch
+            {
+                throw;
+
+            }
+        }
+
 
         // THIS VERSION DOES NOT INCLUDE BOMGAR SO IT IS CLOSED
         //private static bool IsBomgarInstalled()
@@ -624,13 +726,14 @@ namespace RemoteServiceInstallWixCustom
             return res;
         }
         
+       
         internal static bool IsUwfEnabled()
         {
             try
             {
                 if (wmiScope.IsConnected)
                 {
-                    using (ManagementClass mc = new ManagementClass(wmiScope.Path.Path, "UWF_Filter", null))
+                    using (ManagementClass mc = new ManagementClass(wmiScope.Path.Path, "UWF_Filter", null))//this line cause to exception in win10
                     {
                         //next line failes with Access Denied under normal user account
                         ManagementObjectCollection moc = mc.GetInstances();
@@ -643,13 +746,13 @@ namespace RemoteServiceInstallWixCustom
                 }
                 else
                 {
-                    throw new InvalidOperationException("WMI is disconnected.");
+                    //throw new InvalidOperationException("WMI is disconnected.");
                 }
             }
             catch (Exception ex)
             {
                 // applicationLog.WriteEntry(string.Format("IsUwfEnabled error: {0}", ex.Message), EventLogEntryType.Error);
-                throw ex;
+                //throw ex;
             }
 
             return false;

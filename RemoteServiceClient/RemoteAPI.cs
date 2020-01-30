@@ -19,22 +19,59 @@ namespace Lumenis.RemoteServiceApi
         // private RemoteServiceClient _remoteService = null;
         ChannelFactory<IRemoteService> _factory;
         IRemoteService _remoteService;
-        NetTcpBinding myBinding = null;//NetTcpBinding_RemoteService
+        NetNamedPipeBinding myBinding = null;//NetTcpBinding_RemoteService
         EndpointAddress myEndpoint = null;
         
 
 
         public RemoteAPI()
         {
-             myBinding = new NetTcpBinding("NetTcpBinding_RemoteService");//NetTcpBinding_RemoteService
-             myEndpoint = new EndpointAddress("net.tcp://localhost:49494/RemoteService/ppool");
+            //       < client >
+            //  < endpoint  address = "net.pipe://localhost/RemoteService/ppool" binding = "netNamedPipeBinding"
+            //      bindingConfiguration = "NetNamedPipeBinding_RemoteService" contract = "Interfaces.IRemoteService"
+            //      name = "NetNamedPipeBinding_RemoteService" >
+            //  </ endpoint >
+            //</ client >
+            // myBinding = new NetNamedPipeBinding("NetNamedPipeBinding_RemoteService");//NetTcpBinding_RemoteService
+            try
+            {
+                myBinding = new NetNamedPipeBinding();//NetTcpBinding_RemoteService
+
+                myEndpoint = new EndpointAddress("net.pipe://localhost/RemoteService/ppool");
+            }
+            catch
+            {
+
+              
+            }
+            
             
            // Logger.Debug("end point address is {0}","net.tcp://localhost:49494/RemoteService/ppool");
         }
 
-        public void StartClient()
+        //public void StartClient()
+        //{
+           
+        //    try
+        //    {
+        //        _factory = new ChannelFactory<IRemoteService>(myBinding, myEndpoint);
+
+        //        _remoteService = _factory.CreateChannel(myEndpoint);// as RemoteService;
+
+
+        //        _factory.Faulted += _factory_Faulted;
+        //        _factory.Closed += _factory_Closed;
+        //        // _factory.Open();
+
+
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        // Logger.Error(ex);
+        //    }
+        //}
+        public void Open()
         {
-            // _factory = new ChannelFactory<IRemoteService>(myBinding, myEndpoint);
             try
             {
                 _factory = new ChannelFactory<IRemoteService>(myBinding, myEndpoint);
@@ -44,14 +81,16 @@ namespace Lumenis.RemoteServiceApi
 
                 _factory.Faulted += _factory_Faulted;
                 _factory.Closed += _factory_Closed;
-              
-                
+                // _factory.Open();
+
+
             }
             catch (Exception ex)
             {
-               // Logger.Error(ex);
+                // Logger.Error(ex);
             }
         }
+
 
         private void _factory_Closed(object sender, EventArgs e)
         {
@@ -64,29 +103,47 @@ namespace Lumenis.RemoteServiceApi
            // Logger.Error("factory error");
         }
 
-        public void Open()
-        {
-            if (_factory.State != CommunicationState.Opened)
-            {
-                _factory.Open(); 
-            }
-        }
+       
 
         public void Close()
         {
-            _factory.Close();
+            try
+            {
+                ValidateConnection();
+                _factory.Close();
+            }
+            catch
+            {
+
+              
+            }
         }
 
         public RemoteStatus GetStatus()
         {
-            ValidateConnection();
-            return _remoteService.GetStatus();
+            try
+            {
+                ValidateConnection();
+                return _remoteService.GetStatus();
+            }
+            catch
+            {
+
+                return new RemoteStatus();
+            }
         }
 
         public void StartRemoteConnection()
         {
-            ValidateConnection();
-            _remoteService.StartConnection();
+            try
+            {
+                ValidateConnection();
+                _remoteService.StartConnection();
+            }
+            catch
+            {
+
+            }
         }
 
         public void StopRemoteConnection()

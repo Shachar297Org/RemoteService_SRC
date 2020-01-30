@@ -35,7 +35,7 @@ namespace LumenisRemoteService
                 }
                 else
                 {
-                    // Logger.Warning("no proper local IP address that matches gateway address");
+                     Logger.Warning("no proper local IP address that matches gateway address");
                 }
 
                 return Address;
@@ -157,12 +157,12 @@ namespace LumenisRemoteService
 
         public static bool _activated = false;
 
-        public static bool CheckIfSessionEstablished()
+        public static void CheckIfSessionEstablished()
         {
             try
             {
                 int port = 443; //<--- This is your value
-                bool isAvailable = true;
+               // bool isAvailable = true;
                 
                 // Evaluate current system tcp connections. This is the same information provided
                 // by the netstat command line application, just in .Net strongly-typed object
@@ -182,19 +182,23 @@ namespace LumenisRemoteService
                         {
                             if (!_activated)
                             {
-                                Logger.Debug("port 443 traffic monitor activated");
+                                Logger.Debug("traffic monitor activated");
                                 NetworkPerformanceReporter.Create();
                                 NetworkPerformanceReporter.TracfficDetected += NetworkPerformanceReporter_TracfficDetected;
                                 _activated = true;
                             }
 
-                            isAvailable = false;
+                           // isAvailable = false;
                             break;
                         }
+                        //else if(tcpi.State == TcpState.TimeWait)
+                        //{
+                        //    _activated = false;
+                       // }
                         
                     }
                 }
-                return isAvailable;
+              //  return isAvailable;
             }
             catch (Exception ex)
             {
@@ -236,13 +240,26 @@ namespace LumenisRemoteService
 
         public static NetworkPerformanceReporter Create()
         {
-            var networkPerformancePresenter = new NetworkPerformanceReporter();
-            networkPerformancePresenter.Initialise();
-            return networkPerformancePresenter;
+
+            try
+            {
+                Logger.Debug("Create");
+                var networkPerformancePresenter = new NetworkPerformanceReporter();
+                networkPerformancePresenter.Initialise();
+                return networkPerformancePresenter;
+            }
+            catch (Exception ex)
+            {
+
+                Logger.Error(ex);
+                return null;
+            }
         }
 
         private void Initialise()
         {
+            Logger.Debug("Initialise");
+
             // Note that the ETW class blocks processing messages, so should be run on a different thread if you want the application to remain responsive.
             Task.Run(() => StartEtwSession());
         }
@@ -252,6 +269,7 @@ namespace LumenisRemoteService
             try
             {
 
+                Logger.Debug("StartEtwSession");
                 Process[] process = Process.GetProcessesByName("ScreenConnect.ClientService");
                 if (process.Length < 1)
                 {
@@ -260,39 +278,70 @@ namespace LumenisRemoteService
                 }
                 var processId = process[0].Id;
                 ResetCounters();
-
-                using (m_EtwSession = new TraceEventSession("MyKernelAndClrEventsSession"))
+                string eventSessionName = string.Empty;
+               if(Environment.OSVersion.VersionString.Contains("6.2"))
                 {
-                    m_EtwSession.EnableKernelProvider(KernelTraceEventParser.Keywords.NetworkTCPIP);
+                    //win 10 embedded
+                    eventSessionName = "MyKernelAndClrEventsSession";
+                }
+                else
+                {
+                    //win 7 embedded
+                    eventSessionName = "NT Kernel Logger";
+                }
+                Logger.Information(string.Format("event session name is {0}",eventSessionName));
+                using (m_EtwSession = new TraceEventSession(eventSessionName))
+                {
 
-                    m_EtwSession.Source.Kernel.TcpIpRecv += data =>
+                 
+                    try
                     {
-                        if (data.ProcessID == processId)
+                        //var name = KernelTraceEventParser.KernelSessionName;
+                       // Logger.Information(string.Format("trace event name is : {0}", name));
+                        m_EtwSession.EnableKernelProvider(KernelTraceEventParser.Keywords.NetworkTCPIP,KernelTraceEventParser.Keywords.None);
+                    
+                    
+                        m_EtwSession.Source.Kernel.TcpIpRecv += data =>
                         {
-                            lock (m_Counters)
+                            if (data.ProcessID == processId)
                             {
-                                m_Counters.Received += data.size;
-                                Logger.Information("received size is : {0}", m_Counters.Received.ToString());
-                                TracfficDetected(true);
+                                lock (m_Counters)
+                                {
+                                   // if(m_Counters.Received != data.size)
+                                   // {
+                                        m_Counters.Received += data.size;
+                                        Logger.Information("received size is : {0}", m_Counters.Received.ToString());
+                                        TracfficDetected(true);
+                                   // }
+                                   
 
+                                }
                             }
-                        }
-                    };
+                        };
 
-                    m_EtwSession.Source.Kernel.TcpIpSend += data =>
+                        //m_EtwSession.Source.Kernel.TcpIpSend += data =>
+                        //{
+                        //    if (data.ProcessID == processId)
+                        //    {
+                        //        lock (m_Counters)
+                        //        {
+                        //            if (m_Counters.Sent != data.size)
+                        //            {
+                        //                m_Counters.Sent += data.size;
+                        //                Logger.Information("sent size is : {0}", m_Counters.Received.ToString());
+                        //                TracfficDetected(true);
+                        //            }
+
+                        //        }
+                        //    }
+                        //};
+
+                        m_EtwSession.Source.Process();
+                    }
+                    catch (Exception ex)
                     {
-                        if (data.ProcessID == processId)
-                        {
-                            lock (m_Counters)
-                            {
-                                m_Counters.Sent += data.size;
-                                Logger.Information("sent size is : {0}", m_Counters.Received.ToString());
-                                TracfficDetected(true);
-                            }
-                        }
-                    };
-
-                    m_EtwSession.Source.Process();
+                        Logger.Error(ex);
+                    }
                 }
             }
             catch (Exception ex)
@@ -347,3 +396,5 @@ namespace LumenisRemoteService
         public long BytesSent { get; set; }
     }
 }
+
+

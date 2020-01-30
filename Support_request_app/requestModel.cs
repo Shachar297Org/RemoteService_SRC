@@ -1,5 +1,7 @@
-﻿using Interfaces;
-using Logging;
+﻿using COM;
+using Interfaces;
+using Lumenis.LicenseApi;
+//using Logging;
 using Lumenis.RemoteServiceApi;
 //using LumenisRemoteService;
 using System;
@@ -25,9 +27,10 @@ namespace Support_request_app
     }
     public class RequestModel : BaseNotifier
     {
-        private static readonly ILogger Logger = LoggerFactory.Default.GetCurrentClassLogger();
-        RemoteAPI remoteApi = null; 
-        System.Timers.Timer _timer = new System.Timers.Timer(3000);//this timer also for getting the status but also for keep alive check
+       // private static readonly ILogger Logger = LoggerFactory.Default.GetCurrentClassLogger();
+        ComLib _com = null;
+      //  RemoteAPI remoteApi = null; 
+       // System.Timers.Timer _timer = new System.Timers.Timer(3000);//this timer also for getting the status but also for keep alive check
 
 
 
@@ -35,61 +38,95 @@ namespace Support_request_app
         {
             try
             {
-                remoteApi = new RemoteAPI();
-                remoteApi.StartClient();
-                _timer.Elapsed += _timer_Elapsed;
-                _timer.Start();
-                Logger.Debug("starting client channel");
+                _com = new ComLib();
+                _com._newStatusArrived += com_newStatusArrived;
+               // remoteApi = new RemoteAPI();
+               // remoteApi.StartClient();
+                //_timer.Elapsed += _timer_Elapsed;
+                //_timer.Start();
+                //Logger.Debug("starting client channel");
+                CheckServiceHasp();
             }
             catch (Exception ex)
             {
-                Logger.Error(ex);
+              //  Logger.Error(ex);
             }
         }
 
-        private void _timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        private void com_newStatusArrived(StatusEvent p_status)
         {
             try
             {
-                GetStatuses();//todo should only be performed if user app is active and not minimized
+                var sessionStatusResult = p_status.Status;
+                Application.Current.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Normal, new Action(() =>
+                {
+                   
+                    SessionStatus = ConvertSessionStatusEnum(sessionStatusResult);
+                }));
+
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                Logger.Error(ex);
+               // Logger.Debug(ex);
             }
         }
 
+        //private void _timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        //{
+        //    try
+        //    {
+        //        GetStatuses();//todo should only be performed if user app is active and not minimized
+        //    }
+        //    catch(Exception ex)
+        //    {
+        //        Logger.Error(ex);
+        //    }
+        //}
+        private  bool CheckServiceHasp()
+        {
+            SecurityKey securityKey = new SecurityKey();
+            List<int> features = new List<int>() {10001,16000 };
+            foreach (int current in features)
+            {
+                if (current >= 10000 && securityKey.UseFeature(current))
+                {
+                    return true;
+                }
+            }
+            return securityKey.UseFeature(55555);
+        }
         public void RequestSupport()
         {
+
+            _com.RequestSupport();
             
-            remoteApi.StartScreenConnect();
-            var result = remoteApi.GetScreenConnectStatus();
-            ServiceStatus = ConvertServiceStatusEnum(result);
+            //var result = remoteApi.GetScreenConnectStatus();
+            //ServiceStatus = ConvertServiceStatusEnum(result);
            
         }
 
         public void StopSupport()
         {
-            remoteApi.StopScreenConnect();
+            _com.StopSupport();
         }
 
-        public void GetStatuses()
-        {
-            var serviceStatusResult = remoteApi.GetScreenConnectStatus();
-            var sessionStatusResult = remoteApi.GetSessionStatus();
+        //public void GetStatuses()
+        //{
+        //    var serviceStatusResult = remoteApi.GetScreenConnectStatus();
+        //    var sessionStatusResult = remoteApi.GetSessionStatus();
            
 
-            Application.Current.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Normal, new Action(() =>
-            {
-                ServiceStatus = ConvertServiceStatusEnum(serviceStatusResult);
-                SessionStatus = ConvertSessionStatusEnum(sessionStatusResult);
-            }));
+        //    Application.Current.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Normal, new Action(() =>
+        //    {
+        //        ServiceStatus = ConvertServiceStatusEnum(serviceStatusResult);
+        //        SessionStatus = ConvertSessionStatusEnum(sessionStatusResult);
+        //    }));
 
-            //if(sessionStatusResult == ScreeenConnectSessionStatus.SessionIsActive)
-            //{
-            //    GetRemainingSessionTime();
-            //}
-        }
+        //    //if(sessionStatusResult == ScreeenConnectSessionStatus.SessionIsActive)
+        //    //{
+        //    //    GetRemainingSessionTime();
+        //    //}
+        //}
 
         public void RenewSessionLimit()
         {
@@ -112,34 +149,34 @@ namespace Support_request_app
 
 
 
-        private bool _isServiceConnected = false;
+       // private bool _isServiceConnected = false;
 
-        private string _serviceStatus = "None";
+       // private string _serviceStatus = "None";
         private string _sessionStatus = "None";
 
-        private TimeSpan _sessionTimeLeft;//todo add converter before attaching to the GUI
+       // private TimeSpan _sessionTimeLeft;//todo add converter before attaching to the GUI
 
 
-        public bool IsServiceConnected { get { return _isServiceConnected; } set { _isServiceConnected = value; OnPropertyChanged("IsServiceConnected"); } }
+       // public bool IsServiceConnected { get { return _isServiceConnected; } set { _isServiceConnected = value; OnPropertyChanged("IsServiceConnected"); } }
 
         //ScreeenConnectServiceStatus
-        public string ServiceStatus { get { return _serviceStatus; } set { _serviceStatus = value; OnPropertyChanged("ServiceStatus"); } }
+      //  public string ServiceStatus { get { return _serviceStatus; } set { _serviceStatus = value; OnPropertyChanged("ServiceStatus"); } }
 
         public string SessionStatus { get { return _sessionStatus; } set { _sessionStatus = value; OnPropertyChanged("SessionStatus"); } }
 
-        public TimeSpan SessionTimeLeft { get { return _sessionTimeLeft; } set { _sessionTimeLeft = value; OnPropertyChanged("SessionTimeLeft"); } }
+        //public TimeSpan SessionTimeLeft { get { return _sessionTimeLeft; } set { _sessionTimeLeft = value; OnPropertyChanged("SessionTimeLeft"); } }
 
-        private string ConvertServiceStatusEnum(ScreeenConnectServiceStatus p_enum)
-        {
-            switch(p_enum)
-            {
-                case ScreeenConnectServiceStatus.None: return "Unknown";
-                case ScreeenConnectServiceStatus.NotInstalled: return "Service not installed";
-                case ScreeenConnectServiceStatus.Running: return "Service is running";
-                case ScreeenConnectServiceStatus.Stopped: return "Service stopped";
-                default: return "Unknown";
-            }
-        }
+        //private string ConvertServiceStatusEnum(ScreeenConnectServiceStatus p_enum)
+        //{
+        //    switch(p_enum)
+        //    {
+        //        case ScreeenConnectServiceStatus.None: return "Unknown";
+        //        case ScreeenConnectServiceStatus.NotInstalled: return "Service not installed";
+        //        case ScreeenConnectServiceStatus.Running: return "Service is running";
+        //        case ScreeenConnectServiceStatus.Stopped: return "Service stopped";
+        //        default: return "Unknown";
+        //    }
+        //}
 
         private string ConvertSessionStatusEnum(ScreeenConnectSessionStatus p_enum)
         {

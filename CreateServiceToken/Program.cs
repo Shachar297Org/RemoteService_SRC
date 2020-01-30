@@ -58,10 +58,10 @@ namespace Limenis.ServiceToken
             try
             {
                 RemoteAPI remoteApi = new RemoteAPI();
+
+               // remoteApi.StartClient();
+                remoteApi.Open();
                
-                remoteApi.StartClient();
-                remoteApi.StartScreenConnect();
-               // remoteApi.Open();
                 if (create)
                 {
                     remoteApi.CreateFeature(featureId);

@@ -23,55 +23,86 @@
 			<Directory Id="ProgramFiles" Name="Program Files">
         <Directory Id="Lumenis" Name="Lumenis">
           <Directory Id="INSTALLLOCATION" Name="Remote Service">
+          
 					  <Component Id="ServiceComponent" Guid="7CB1DE56-B5D5-4E8B-9C8E-4998084CD08B">
               <?ifdef Debug ?>
+             
                 <File Id='RemoteService' Name='RemoteService.exe' DiskId='1' Source='..\RemoteService\bin\Debug\RemoteService.exe' KeyPath='yes'/>
                 <File Id='RemoteServiceConfig' Name='RemoteService.exe.config' DiskId='1' Source='..\RemoteService\bin\Debug\RemoteService.exe.config'/>
-              <?else?>
-                <File Id='RemoteService' Name='RemoteService.exe' DiskId='1' Source='..\RemoteService\bin\Release\RemoteService.exe' KeyPath='yes'/>
-                <File Id='RemoteServiceConfig' Name='RemoteService.exe.config' DiskId='1' Source='..\RemoteService\bin\Release\RemoteService.exe.config'/>
-              <?endif?>
+              <File Id='KernelTraceControl' Name='KernelTraceControl.dll.' DiskId='1' Source='..\RemoteService\bin\Debug\x86\KernelTraceControl.dll'/>
+              <File Id='KernelTraceControl.Win61' Name='KernelTraceControl.Win61.dll' DiskId='1' Source='..\RemoteService\bin\Debug\x86\KernelTraceControl.Win61.dll'/>
+              <File Id='Media' Name='msdia140.dll' DiskId='1' Source='..\RemoteService\bin\Debug\x86\msdia140.dll'/>
               <File Id='WinSCP' Name='WinSCP.dll' DiskId='1' Source='..\ThirdPartyFiles\WinSCP.dll'/>
+              <File Id='gacutil' Name='gacutil.exe' DiskId='1' Source='..\ThirdPartyFiles\gacutil.exe'/>
               <File Id='interfaces' Name='interfaces.dll' DiskId='1' Source='..\RemoteService\bin\Debug\Interfaces.dll'/>
               <File Id='logging' Name='logging.dll' DiskId='1' Source='..\RemoteService\bin\Debug\Logging.dll'/>
               <File Id='nlog' Name='nlog.dll' DiskId='1' Source='..\RemoteService\bin\Debug\NLog.dll'/>
-              <File Id='nlogConfig' Name='nlogConfig.dll' DiskId='1' Source='..\RemoteService\bin\Debug\NLog.config'/>
+              <File Id='nlogConfig' Name='nlog.config' DiskId='1' Source='..\RemoteService\bin\Debug\NLog.config'/>
+              <File Id='Dia2Lib' Name='Dia2Lib.dll.' DiskId='1' Source='..\RemoteService\bin\Debug\Dia2Lib.dll'/>
+              <File Id='FastSerialization' Name='Microsoft.Diagnostics.FastSerialization.dll' DiskId='1' Source='..\RemoteService\bin\Debug\Microsoft.Diagnostics.FastSerialization.dll'/>
+              <File Id='TraceEvent' Name='Microsoft.Diagnostics.Tracing.TraceEvent.dll' DiskId='1' Source='..\RemoteService\bin\Debug\Microsoft.Diagnostics.Tracing.TraceEvent.dll'/>
+              <File Id='UnitT' Name='Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll' DiskId='1' Source='..\RemoteService\bin\Debug\Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll'/>
+              <File Id='OSExtentions' Name='OSExtensions.dll' DiskId='1' Source='..\RemoteService\bin\Debug\OSExtensions.dll'/>
+              <File Id='RemoteServiceAPI' Name='RemoteServiceApi.dll' DiskId='1' Source='..\RemoteService\bin\Debug\RemoteServiceApi.dll'/>
+              <File Id='RemoteServiceAPIConfig' Name='RemoteServiceApi.dll.config' DiskId='1' Source='..\RemoteService\bin\Debug\RemoteServiceApi.dll.config'/>
+              <File Id='TraceTeloggerLib' Name='TraceReloggerLib.dll' DiskId='1' Source='..\RemoteService\bin\Debug\TraceReloggerLib.dll'/>
+              <File Id='ServiceToken' Name='ServiceToken.exe' DiskId='1' Source='..\CreateServiceToken\bin\Debug\ServiceToken.exe'/>
+              
+              <?else?>
+                <File Id='RemoteService' Name='RemoteService.exe' DiskId='1' Source='..\RemoteService\bin\Release\RemoteService.exe' KeyPath='yes'/>
+                <File Id='RemoteServiceConfig' Name='RemoteService.exe.config' DiskId='1' Source='..\RemoteService\bin\Release\RemoteService.exe.config'/>
+              <File Id='KernelTraceControl' Name='KernelTraceControl.dll.' DiskId='1' Source='..\RemoteService\bin\Debug\x86\KernelTraceControl.dll'/>
+              <File Id='KernelTraceControl.Win61' Name='KernelTraceControl.Win61.dll' DiskId='1' Source='..\RemoteService\bin\Debug\x86\KernelTraceControl.Win61.dll'/>
+              <File Id='Media' Name='msdia140.dll' DiskId='1' Source='..\RemoteService\bin\Debug\x86\msdia140.dll'/>
+              <File Id='WinSCP' Name='WinSCP.dll' DiskId='1' Source='..\ThirdPartyFiles\WinSCP.dll'/>
+              <File Id='gacutil' Name='gacutil.exe' DiskId='1' Source='..\ThirdPartyFiles\gacutil.exe'/>
+              <File Id='interfaces' Name='interfaces.dll' DiskId='1' Source='..\RemoteService\bin\Release\Interfaces.dll'/> <!--assembly have to be sign in order to be registered in GAC-->
+              <File Id='logging' Name='logging.dll' DiskId='1' Source='..\RemoteService\bin\Release\Logging.dll'/> <!--assembly have to be sign in order to be registered in GAC-->
+              <File Id='nlog' Name='nlog.dll' DiskId='1' Source='..\RemoteService\bin\Release\NLog.dll'/> <!--assembly have to be sign in order to be registered in GAC-->
+              <File Id='nlogConfig' Name='nlog.config' DiskId='1' Source='..\RemoteService\bin\Release\NLog.config'/> <!--assembly have to be sign in order to be registered in GAC-->
+              <File Id='Dia2Lib' Name='Dia2Lib.dll.' DiskId='1' Source='..\RemoteService\bin\Release\Dia2Lib.dll'/>
+              <File Id='FastSerialization' Name='Microsoft.Diagnostics.FastSerialization.dll' DiskId='1' Source='..\RemoteService\bin\Release\Microsoft.Diagnostics.FastSerialization.dll'/>
+              <File Id='TraceEvent' Name='Microsoft.Diagnostics.Tracing.TraceEvent.dll' DiskId='1' Source='..\RemoteService\bin\Release\Microsoft.Diagnostics.Tracing.TraceEvent.dll'/>
+              <File Id='UnitT' Name='Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll' DiskId='1' Source='..\RemoteService\bin\Release\Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll'/>
+              <File Id='OSExtentions' Name='OSExtensions.dll' DiskId='1' Source='..\RemoteService\bin\Release\OSExtensions.dll'/>
+              <File Id='RemoteServiceAPI' Name='RemoteServiceApi.dll' DiskId='1' Source='..\RemoteService\bin\Release\RemoteServiceApi.dll'/><!--assembly have to be sign in order to be registered in GAC-->
+              <File Id='RemoteServiceAPIConfig' Name='RemoteServiceApi.dll.config' DiskId='1' Source='..\RemoteService\bin\Release\RemoteServiceApi.dll.config'/>
+              <File Id='TraceTeloggerLib' Name='TraceReloggerLib.dll' DiskId='1' Source='..\RemoteService\bin\Release\TraceReloggerLib.dll'/>
+              <File Id='ServiceToken' Name='ServiceToken.exe' DiskId='1' Source='..\CreateServiceToken\bin\Release\ServiceToken.exe'/>
+              <?endif?>
+              
               
 
               <!--return to code-->
               <ServiceInstall Id='RemoteServiceInstall' DisplayName='Lumenis Remote Service' Name='RemoteService' Description='Controlling remote connectivity with Lumenis device' ErrorControl='normal' Start='auto' Type='ownProcess' Vital='yes' />
               <ServiceControl Id='RemoteServiceControl' Name='RemoteService' Start='install' Stop='uninstall' Remove='uninstall' />
             </Component>
-            
-            <!--<Component Id='BomgarJumpClientComp' Guid='EDA4EC3F-CF0A-4849-980F-038E414F0E59'>-->
-              <!--The Development is defined as Define Preprocessor Variables in the RemoteServiceInstallWiX file -->
-              <!--<?if $(var.Development) = true ?>
-                <File Id='BomgarJumpClient' Name='bomgar-scc-w0idc30d881fdg6wdej5eegf81g7xwh5781xgjhc40jc90.exe' Source='..\ThirdPartyFiles\Development\bomgar-scc-w0idc30d881fdg6wdej5eegf81g7xwh5781xgjhc40jc90.exe' Vital='no' />
-              <?else ?>-->
-              <!--(var.Development) = false - for production-->
-                <!--<File Id='BomgarJumpClient' Name='bomgar-scc-w0idc30d881fdg6wdej5eegf81g7xwh5781xgjhc40jc90.exe' Source='..\ThirdPartyFiles\Production\bomgar-scc-w0idc30d881fdg6wdej5eegf81g7xwh5781xgjhc40jc90.exe' Vital='no' />
-              <?endif ?>
-            </Component>-->
-            
+
             <!--<Component Id='RemoteServiceAPIComponent' Guid='C5C61B35-DD44-4FAD-82D5-F2084FF37B99'>
               <?ifdef Debug ?>
-                <File Id='RemoteServiceApiGAC' Name='RemoteServiceApi.dll' Assembly='.net' KeyPath='yes' DiskId='1' Source='..\RemoteServiceClient\bin\Debug\RemoteServiceApi.dll'/>
+                <File Id='RemoteServiceApiGAC' Name='RemoteServiceApi.dll' Assembly='.net' KeyPath='yes' DiskId='1' Source='..\RemoteService\bin\Debug\RemoteServiceApi.dll'/>
               <?else?>
-                <File Id='RemoteServiceApiGAC' Name='RemoteServiceApi.dll' Assembly='.net' KeyPath='yes' DiskId='1' Source='..\RemoteServiceClient\bin\Release\RemoteServiceApi.dll'/>
+                <File Id='RemoteServiceApiGAC' Name='RemoteServiceApi.dll' Assembly='.net' KeyPath='yes' DiskId='1' Source='..\RemoteService\bin\Release\RemoteServiceApi.dll'/>
               <?endif?>
-            </Component>-->
+            </Component>-->     
 
           </Directory>
         </Directory>
 			</Directory>
 		</Directory>
 
+ 
+
+  
+
     <Feature Id="MyFeatures" Level="1" ConfigurableDirectory='INSTALLLOCATION' Display='expand' AllowAdvertise='no'>
       <!-- Default feature -->
       <Feature Id="ProductFeature" AllowAdvertise='no' Display='expand' Level='1' ConfigurableDirectory='INSTALLLOCATION' >
         <ComponentRef Id="ServiceComponent" />
+       
         <!--<ComponentRef Id="RemoteServiceAPIComponent"/>-->
       </Feature>
+     
         
       <!-- Non-default feature -->
       <!--<Feature Id="BomgarJumpClientFeature" AllowAdvertise='no' Display='expand' Level='0' ConfigurableDirectory='INSTALLLOCATION'>
@@ -80,23 +111,43 @@
       </Feature>-->
     </Feature>
 
+  
+
+    
+
     <!-- Define custom actions and corresponding custom action DLLs when required -->
+    <Binary Id='api'  SourceFile='..\ThirdPartyFiles\apidsp_windows.dll' />
+    <Binary Id='api_64'  SourceFile='..\ThirdPartyFiles\apidsp_windows_x64.dll' />
+    <Binary Id='hasp'  SourceFile='..\ThirdPartyFiles\hasp_windows_113740.dll' />
+    <Binary Id='hasp_win'  SourceFile='..\ThirdPartyFiles\hasp_windows_demo.dll' />
+    <Binary Id='hasp_64'  SourceFile='..\ThirdPartyFiles\hasp_windows_x64_113740.dll' />
+    <Binary Id='haswp_net'  SourceFile='..\ThirdPartyFiles\hasp_net_windows.dll' />
+   
+
     <?ifdef Debug ?>
       <Binary Id='WixCustom'  SourceFile='..\RemoteServiceInstallWixCustom\bin\Debug\RemoteServiceInstallWixCustom.CA.dll' />
+    
     <?else?>
       <Binary Id='WixCustom'  SourceFile='..\RemoteServiceInstallWixCustom\bin\Release\RemoteServiceInstallWixCustom.CA.dll' />
+   
     <?endif?>
 
+   
     <CustomAction Id='CheckPrereq' BinaryKey='WixCustom' DllEntry='CheckPrerequisites' />
+    <!--<CustomAction Id='copyx86' BinaryKey='WixCustom' DllEntry='CopyToX86Folder' />-->
     <CustomAction Id='ChangeComputerName' BinaryKey='WixCustom' DllEntry='ChangeComputerName' />
-    <CustomAction Id='WcfCommit' BinaryKey='WixCustom' DllEntry='WcfCommit' />
+    <!--<CustomAction Id='WcfCommit' BinaryKey='WixCustom' DllEntry='WcfCommit' />-->
     <!--<CustomAction Id='LaunchJumpClientInstall' FileKey='BomgarJumpClient' ExeCommand='' Return='check' />-->
+
+  
 
     <!-- Applying custom actions during installation -->
     <InstallExecuteSequence>
       <Custom Action='ChangeComputerName' After='StartServices'></Custom>
+      <!--<Custom Action='copyx86' After='StartServices'></Custom>-->
       <!--<Custom Action='LaunchJumpClientInstall' After='InstallFinalize'>($BomgarJumpClientComp=3)</Custom>-->
       <!--<Custom Action='WcfCommit' After='LaunchJumpClientInstall'>($BomgarJumpClientComp=3)</Custom>-->
+     
     </InstallExecuteSequence>
 
     <!-- Define custom properties -->
@@ -117,7 +168,7 @@
       <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="CheckPrerequisitesDlg">1</Publish>
       <Publish Dialog="WelcomeDlg" Control="Next" Event="DoAction" Value="CheckPrereq">1</Publish>
       <Publish Dialog="InstallDirDlg" Control="Back" Event="NewDialog" Value="CheckPrerequisitesDlg">1</Publish>
-    </UI>
+        </UI>
     
   </Product>
 </Wix>
