@@ -25,7 +25,7 @@ namespace Lumenis.RemoteServiceApi
             return _remoteService.GetScreenConnectStatus();
         }
 
-        public ScreeenConnectSessionStatus GetSessionStatus()
+        public ScreenConnectSessionStatus GetSessionStatus()
         {
             return _remoteService.GetSessiontStatus();
         }

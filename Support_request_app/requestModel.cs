@@ -1,6 +1,5 @@
-﻿using COM;
+﻿using COMM;
 using Interfaces;
-using Lumenis.LicenseApi;
 //using Logging;
 using Lumenis.RemoteServiceApi;
 //using LumenisRemoteService;
@@ -45,7 +44,6 @@ namespace Support_request_app
                 //_timer.Elapsed += _timer_Elapsed;
                 //_timer.Start();
                 //Logger.Debug("starting client channel");
-                CheckServiceHasp();
             }
             catch (Exception ex)
             {
@@ -82,19 +80,7 @@ namespace Support_request_app
         //        Logger.Error(ex);
         //    }
         //}
-        private  bool CheckServiceHasp()
-        {
-            SecurityKey securityKey = new SecurityKey();
-            List<int> features = new List<int>() {10001,16000 };
-            foreach (int current in features)
-            {
-                if (current >= 10000 && securityKey.UseFeature(current))
-                {
-                    return true;
-                }
-            }
-            return securityKey.UseFeature(55555);
-        }
+       
         public void RequestSupport()
         {
 
@@ -178,15 +164,15 @@ namespace Support_request_app
         //    }
         //}
 
-        private string ConvertSessionStatusEnum(ScreeenConnectSessionStatus p_enum)
+        private string ConvertSessionStatusEnum(ScreenConnectSessionStatus p_enum)
         {
             switch (p_enum)
             {
-                case ScreeenConnectSessionStatus.None: return "Unknown";
-                case ScreeenConnectSessionStatus.CableDisconnected: return "Cable is disconnected";
-                case ScreeenConnectSessionStatus.SessionInStandby: return "Session in standby";
-                case ScreeenConnectSessionStatus.SessionIsActive: return "Session is active";
-                case ScreeenConnectSessionStatus.SessionDisconnected: return "Session disconnected";
+                case ScreenConnectSessionStatus.None: return "Unknown";
+                case ScreenConnectSessionStatus.CableDisconnected: return "Cable is disconnected";
+                case ScreenConnectSessionStatus.SessionInStandby: return "Session in standby";
+                case ScreenConnectSessionStatus.SessionIsActive: return "Session is active";
+                case ScreenConnectSessionStatus.SessionDisconnected: return "Session disconnected";
                 default: return "Unknown";
             }
         }

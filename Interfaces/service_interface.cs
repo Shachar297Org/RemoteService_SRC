@@ -24,7 +24,7 @@ namespace Interfaces
     }
 
     [DataContract]
-    public enum ScreeenConnectSessionStatus
+    public enum ScreenConnectSessionStatus
     {
         [EnumMember]
         None,
@@ -103,7 +103,7 @@ namespace Interfaces
         ScreeenConnectServiceStatus GetScreenConnectStatus();
 
         [OperationContract]
-        ScreeenConnectSessionStatus GetSessiontStatus();
+        ScreenConnectSessionStatus GetSessiontStatus();
 
         //[OperationContract]
         //void RenewSessionLimit();

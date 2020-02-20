@@ -324,29 +324,7 @@ namespace RemoteServiceInstallWixCustom
             }
         }
 
-        private static void RegisterToGAC()
-        {
-            try
-            {
-                //System.EnterpriseServices.Internal.Publish gg = new Publish();
-                //  gg.GacInstall("NLog.dll");
-                //gg.GacRemove("NLog.dll");
-                //gg.GacRemove("COM.dll");
-                //gg.GacRemove("Interfaces.dll");
-                //gg.GacRemove("Logging.dll");
-                //gg.GacRemove("RemoteServiceApi.dll");
-                //gg.GacInstall("NLog.dll");
-                //gg.GacInstall("COM.dll");
-                //gg.GacInstall("Interfaces.dll");
-                //gg.GacInstall("Logging.dll");
-                //gg.GacInstall("RemoteServiceApi.dll");
-            }
-            catch
-            {
-                throw;
-
-            }
-        }
+       
 
 
         // THIS VERSION DOES NOT INCLUDE BOMGAR SO IT IS CLOSED

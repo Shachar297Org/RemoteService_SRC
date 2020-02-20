@@ -17,7 +17,10 @@ namespace LumenisRemoteService
         private static readonly ILogger Logger = LoggerFactory.Default.GetCurrentClassLogger();
 
 
-
+        /// <summary>
+        /// Get the IP which the device should get from the router through DHCP
+        /// </summary>
+        /// <returns></returns>
         public static string GetEthernetAddress()
         {
             List<IPAddress> gatewaysList = null;
@@ -72,7 +75,6 @@ namespace LumenisRemoteService
                         return gate.Address.ToString();
                     }
                 }
-                // Logger.Warning("fail to find proper lan gateway");
             }
             catch (Exception ex)
             {
@@ -115,14 +117,6 @@ namespace LumenisRemoteService
                         {
                             if (address.Count > 0)
                             {
-                                // foreach(GatewayIPAddressInformation ip in address)
-                                // {
-                                // if(ip.Address.AddressFamily.ToString() == "InterNetwork")
-                                // {
-                                // return ip.Address.ToString();
-                                // }
-                                // }
-
                                 System.Net.NetworkInformation.GatewayIPAddressInformation gateway = address[0];
                                 gatewaysList.Add(gateway);
                             }
@@ -162,7 +156,6 @@ namespace LumenisRemoteService
             try
             {
                 int port = 443; //<--- This is your value
-               // bool isAvailable = true;
                 
                 // Evaluate current system tcp connections. This is the same information provided
                 // by the netstat command line application, just in .Net strongly-typed object
@@ -188,17 +181,11 @@ namespace LumenisRemoteService
                                 _activated = true;
                             }
 
-                           // isAvailable = false;
                             break;
                         }
-                        //else if(tcpi.State == TcpState.TimeWait)
-                        //{
-                        //    _activated = false;
-                       // }
                         
                     }
                 }
-              //  return isAvailable;
             }
             catch (Exception ex)
             {
@@ -236,7 +223,6 @@ namespace LumenisRemoteService
             public long Sent;
         }
 
-       // private NetworkPerformanceReporter() { }
 
         public static NetworkPerformanceReporter Create()
         {
@@ -258,7 +244,7 @@ namespace LumenisRemoteService
 
         private void Initialise()
         {
-            Logger.Debug("Initialise");
+            Logger.Debug("Initialize");
 
             // Note that the ETW class blocks processing messages, so should be run on a different thread if you want the application to remain responsive.
             Task.Run(() => StartEtwSession());
@@ -296,8 +282,6 @@ namespace LumenisRemoteService
                  
                     try
                     {
-                        //var name = KernelTraceEventParser.KernelSessionName;
-                       // Logger.Information(string.Format("trace event name is : {0}", name));
                         m_EtwSession.EnableKernelProvider(KernelTraceEventParser.Keywords.NetworkTCPIP,KernelTraceEventParser.Keywords.None);
                     
                     
@@ -307,34 +291,15 @@ namespace LumenisRemoteService
                             {
                                 lock (m_Counters)
                                 {
-                                   // if(m_Counters.Received != data.size)
-                                   // {
                                         m_Counters.Received += data.size;
                                         Logger.Information("received size is : {0}", m_Counters.Received.ToString());
                                         TracfficDetected(true);
-                                   // }
                                    
 
                                 }
                             }
                         };
 
-                        //m_EtwSession.Source.Kernel.TcpIpSend += data =>
-                        //{
-                        //    if (data.ProcessID == processId)
-                        //    {
-                        //        lock (m_Counters)
-                        //        {
-                        //            if (m_Counters.Sent != data.size)
-                        //            {
-                        //                m_Counters.Sent += data.size;
-                        //                Logger.Information("sent size is : {0}", m_Counters.Received.ToString());
-                        //                TracfficDetected(true);
-                        //            }
-
-                        //        }
-                        //    }
-                        //};
 
                         m_EtwSession.Source.Process();
                     }

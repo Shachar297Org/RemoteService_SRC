@@ -63,7 +63,7 @@
               <File Id='Dia2Lib' Name='Dia2Lib.dll.' DiskId='1' Source='..\RemoteService\bin\Release\Dia2Lib.dll'/>
               <File Id='FastSerialization' Name='Microsoft.Diagnostics.FastSerialization.dll' DiskId='1' Source='..\RemoteService\bin\Release\Microsoft.Diagnostics.FastSerialization.dll'/>
               <File Id='TraceEvent' Name='Microsoft.Diagnostics.Tracing.TraceEvent.dll' DiskId='1' Source='..\RemoteService\bin\Release\Microsoft.Diagnostics.Tracing.TraceEvent.dll'/>
-              <File Id='UnitT' Name='Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll' DiskId='1' Source='..\RemoteService\bin\Release\Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll'/>
+              <File Id='UnitT' Name='Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll' DiskId='1' Source='..\RemoteService\bin\Debug\Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll'/>
               <File Id='OSExtentions' Name='OSExtensions.dll' DiskId='1' Source='..\RemoteService\bin\Release\OSExtensions.dll'/>
               <File Id='RemoteServiceAPI' Name='RemoteServiceApi.dll' DiskId='1' Source='..\RemoteService\bin\Release\RemoteServiceApi.dll'/><!--assembly have to be sign in order to be registered in GAC-->
               <File Id='RemoteServiceAPIConfig' Name='RemoteServiceApi.dll.config' DiskId='1' Source='..\RemoteService\bin\Release\RemoteServiceApi.dll.config'/>

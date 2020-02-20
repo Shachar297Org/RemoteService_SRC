@@ -78,10 +78,6 @@
       <Project>{50af1e57-ac3b-4c51-bc5c-3057893d4a30}</Project>
       <Name>Interfaces</Name>
     </ProjectReference>
-    <ProjectReference Include="..\LicenseApi\LicenseApi.csproj">
-      <Project>{67b4c3eb-882c-4405-a6b7-332bc6b5e3e5}</Project>
-      <Name>LicenseApi</Name>
-    </ProjectReference>
     <ProjectReference Include="..\RemoteServiceClient\RemoteServiceApi.csproj">
       <Project>{3CA2BB56-8978-4A00-9445-211F416866E4}</Project>
       <Name>RemoteServiceApi</Name>

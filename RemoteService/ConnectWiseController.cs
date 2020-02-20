@@ -29,14 +29,11 @@ namespace LumenisRemoteService
         #region Session monitoring flag
 
         private bool _receivedIp = false;
-       // private bool _isPortOpened = false;
 
         #endregion
 
-       // private System.Diagnostics.Stopwatch _sessionWatch = new System.Diagnostics.Stopwatch();
         private System.Timers.Timer _timer;
-        // private System.Timers.Timer _sessionReadyLimittimer;// restrict the time frame which the device can be exposed and be ready to session connection
-        // private System.Timers.Timer _inactivityTimer;
+       
 
         private System.Timers.Timer _trafficMonitoringTimer;
        
@@ -45,13 +42,10 @@ namespace LumenisRemoteService
         private readonly double TRAFFICMONITORINTERVAL = new TimeSpan(0, 0, 5).TotalMilliseconds;
         private readonly double SESSIONLIMITINTERVAL = new TimeSpan(0, 5, 0).TotalMilliseconds;
         private readonly double TRAFFICMONITORINGINTERVAL = new TimeSpan(0, 0, 40).TotalMilliseconds;
-        //private readonly double AppInactivityINTERVAL = new TimeSpan(0, 1, 0).TotalMilliseconds;
-
-        //private TimeSpan _sessionTimeLeft;
-        //private  TimeSpan _SESSIONTIMESPAN = new TimeSpan(0,5,0);
+       
 
         public ScreeenConnectServiceStatus ServiceStatus { get; private set; } = ScreeenConnectServiceStatus.None;
-        public ScreeenConnectSessionStatus SessionStatus { get; private set; } = ScreeenConnectSessionStatus.None;
+        public ScreenConnectSessionStatus SessionStatus { get; private set; } = ScreenConnectSessionStatus.None;
 
         int _counter = 1;
         int _maxCounter = 12; //0.5 seconds * 12 equal 60 seconds
@@ -85,7 +79,7 @@ namespace LumenisRemoteService
                     Logger.Information("service installed");
                     _serviceInstalled = true;
                 }
-                SessionStatus = ScreeenConnectSessionStatus.SessionDisconnected;
+                SessionStatus = ScreenConnectSessionStatus.SessionDisconnected;
             }
             catch (Exception ex)
             {
@@ -104,7 +98,7 @@ namespace LumenisRemoteService
                 NetworkHelper.TrafficDetected = false;
                 lock (_syncObj)
                 {
-                    SessionStatus = ScreeenConnectSessionStatus.SessionIsActive;
+                    SessionStatus = ScreenConnectSessionStatus.SessionIsActive;
                     _counter = 1;
                 }
             }
@@ -114,7 +108,7 @@ namespace LumenisRemoteService
                 {
                     lock (_syncObj)
                     {
-                        SessionStatus = ScreeenConnectSessionStatus.SessionInStandby;
+                        SessionStatus = ScreenConnectSessionStatus.SessionInStandby;
                         _counter++;
                     }
                 }
@@ -124,7 +118,7 @@ namespace LumenisRemoteService
                     Logger.Debug("closing service because of traffic inactivity. inactivity counter is {0}", _counter);
                     lock (_syncObj)
                     {
-                        SessionStatus = ScreeenConnectSessionStatus.SessionDisconnected;
+                        SessionStatus = ScreenConnectSessionStatus.SessionDisconnected;
                         _counter = 1;
                     }
 
@@ -136,34 +130,6 @@ namespace LumenisRemoteService
              
         }
 
-        //private void _inactivityTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
-        //{
-
-        //    lock (_syncObj)
-        //    {
-        //        _userAppIsRunning = false; 
-        //    }
-        //}
-
-        //private void _sessionReadyLimittimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
-        //{
-        //    try
-        //    {
-        //        _sessionWatch.Stop();
-        //        _sessionReadyLimittimer.Stop();
-        //        Logger.Debug("session reached to it's limit");
-        //        lock (_syncObj)
-        //        {
-        //            _requestForSupportWasMade = false;// will terminate Screen connect service 
-        //        }
-        //        _sessionReadyLimittimer.Start();
-        //        _sessionWatch.Start();
-        //    }
-        //    catch( Exception ex)
-        //    {
-        //        Logger.Error(ex);
-        //    }
-        //}
 
         private void _timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
@@ -189,24 +155,6 @@ namespace LumenisRemoteService
         }
 
 
-        /// <summary>
-        /// Detect ScreenConnect service in run state. if in stopped state DetectService will return false.
-        /// </summary>
-        /// <returns></returns>
-        //public bool DetectService()
-        //{
-
-        //    if (_service != null && _service.Status == ServiceControllerStatus.Running)
-        //    {
-        //        Logger.Debug("service detected");
-        //        return true;
-        //    }
-        //    else
-        //    {
-        //        Logger.Debug("service was not detected");
-        //        return false;
-        //    }
-        //}
 
         /// <summary>
         /// if screen connect service exist turn it to run state
@@ -227,10 +175,6 @@ namespace LumenisRemoteService
                     {
                         _requestForSupportWasMade = true; 
                     }
-                    // _sessionTimeLeft = _SESSIONTIMESPAN;
-                    // _sessionReadyLimittimer.Start();
-                    //_sessionWatch.Start();
-                    //System.Threading.Thread.Sleep(10000);
                     _trafficMonitoringTimer.Start();
                     return true;
                 }
@@ -267,10 +211,8 @@ namespace LumenisRemoteService
                         _requestForSupportWasMade = false; 
                     }
                     _trafficMonitoringTimer.Stop();
-                    //_sessionReadyLimittimer.Stop();
                     _service.Stop();//user case 3
                     _sessionWasActiveOnce = false;//reset the flag each time user request support or stop the service
-                    //System.Threading.Thread.Sleep(10000);
                     return true;
                 }
                 else // if service status is other than the both above
@@ -402,7 +344,7 @@ namespace LumenisRemoteService
                 }
                 else
                 {
-                    SessionStatus = ScreeenConnectSessionStatus.CableDisconnected;
+                    SessionStatus = ScreenConnectSessionStatus.CableDisconnected;
                 }
 
 
