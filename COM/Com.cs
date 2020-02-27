@@ -46,12 +46,27 @@ namespace COMM
         public bool RequestSupport()
         {
 
-            return remoteApi.StartScreenConnect();
+            try
+            {
+                return remoteApi.StartScreenConnect();
+            }
+            catch 
+            {
+
+                return false;
+            }
         }
 
         public bool StopSupport()
         {
-           return remoteApi.StopScreenConnect();
+            try
+            {
+                return remoteApi.StopScreenConnect();
+            }
+            catch
+            {
+                return false;
+            }
         }
     }
 
