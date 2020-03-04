@@ -2,6 +2,7 @@
 using Logging;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
@@ -36,29 +37,45 @@ namespace LumenisRemoteService
        
 
         private System.Timers.Timer _trafficMonitoringTimer;
-       
 
-        private readonly double MONITORINTERVAL = new TimeSpan(0, 0, 10).TotalMilliseconds;
-        private readonly double TRAFFICMONITORINTERVAL = new TimeSpan(0, 0, 5).TotalMilliseconds;
-        private readonly double SESSIONLIMITINTERVAL = new TimeSpan(0, 5, 0).TotalMilliseconds;
-        private readonly double TRAFFICMONITORINGINTERVAL = new TimeSpan(0, 0, 40).TotalMilliseconds;
+
+        private readonly double SERVIICEMONITORINTERVAL = new TimeSpan(0, 0, 10).TotalMilliseconds;
+        private readonly double TRAFFICMONITORINTERVAL;// = new TimeSpan(0, 0, 5).TotalMilliseconds;
+       // private readonly double SESSIONLIMITINTERVAL = new TimeSpan(0, 5, 0).TotalMilliseconds;
+      //  private readonly double TRAFFICMONITORINGINTERVAL = new TimeSpan(0, 0, 40).TotalMilliseconds;
        
 
         public ScreeenConnectServiceStatus ServiceStatus { get; private set; } = ScreeenConnectServiceStatus.None;
         public ScreenConnectSessionStatus SessionStatus { get; private set; } = ScreenConnectSessionStatus.None;
 
         int _counter = 1;
-        int _maxCounter = 12; //0.5 seconds * 12 equal 60 seconds
+        readonly int _maxCounter = 0; //0.5 seconds * 12 equal 60 seconds
 
         public ConnectWiseController()
         {
             try
             {
+                var sessioncounter = Convert.ToString(ConfigurationManager.AppSettings["SessionSampelingCounter"]);
+                var sessionInterval = Convert.ToString(ConfigurationManager.AppSettings["SessionSampelingInterval"]);
+                if (int.TryParse(sessioncounter, out _maxCounter))
+                {
+                    Logger.Error(string.Format("failed to parse session interval counter with value of {0}", sessioncounter));
+                }
+                if (!int.TryParse(sessionInterval, out int interval))
+                {
+                    Logger.Error(string.Format("failed to parse session interval with value of {0}", sessionInterval));
+                }
+
+
+                TRAFFICMONITORINTERVAL = new TimeSpan(0, 0, interval).TotalMilliseconds;
+
+
+
                 JUMP_CLIENT_SERVICE_NAME_PREFIX = "ScreenConnect Client";//todo name should also be fetched from configuration file
 
                 Logger.Information("searching for service name {0}", JUMP_CLIENT_SERVICE_NAME_PREFIX);
 
-                _timer = new System.Timers.Timer(MONITORINTERVAL);
+                _timer = new System.Timers.Timer(SERVIICEMONITORINTERVAL);
                 _timer.Elapsed += _timer_Elapsed;
                 _timer.Start();
 
@@ -92,7 +109,7 @@ namespace LumenisRemoteService
       
         private void _trafficMonitoringTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
-
+           
             if (NetworkHelper.TrafficDetected)
             {
                 NetworkHelper.TrafficDetected = false;
@@ -203,6 +220,7 @@ namespace LumenisRemoteService
         {
             try
             {
+                SessionStatus = ScreenConnectSessionStatus.SessionDisconnected;
                 if (_service != null && _service.Status == ServiceControllerStatus.Running)
                 {
                     Logger.Debug("stop service command");
