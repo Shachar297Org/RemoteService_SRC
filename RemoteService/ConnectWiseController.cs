@@ -71,7 +71,7 @@ namespace LumenisRemoteService
 
 
 
-                JUMP_CLIENT_SERVICE_NAME_PREFIX = "ScreenConnect Client";//todo name should also be fetched from configuration file
+                JUMP_CLIENT_SERVICE_NAME_PREFIX = Convert.ToString(ConfigurationManager.AppSettings["MonitoredProcessName"]);//todo name should also be fetched from configuration file
 
                 Logger.Information("searching for service name {0}", JUMP_CLIENT_SERVICE_NAME_PREFIX);
 
@@ -82,20 +82,7 @@ namespace LumenisRemoteService
                 _trafficMonitoringTimer = new System.Timers.Timer(TRAFFICMONITORINTERVAL);
                 _trafficMonitoringTimer.Elapsed += _trafficMonitoringTimer_Elapsed;
 
-                _service = ServiceController.GetServices().
-                       FirstOrDefault(s => s.DisplayName.StartsWith(JUMP_CLIENT_SERVICE_NAME_PREFIX));
-
-
-                if (_service == null)
-                {
-                    Logger.Warning("service not installed");
-                    _serviceInstalled = false;
-                }
-                else
-                {
-                    Logger.Information("service installed");
-                    _serviceInstalled = true;
-                }
+                CheckServiceInstallation();
                 SessionStatus = ScreenConnectSessionStatus.SessionDisconnected;
             }
             catch (Exception ex)
@@ -104,6 +91,24 @@ namespace LumenisRemoteService
             }
 
 
+        }
+
+        private void CheckServiceInstallation()
+        {
+            _service = ServiceController.GetServices().
+                       FirstOrDefault(s => s.DisplayName.StartsWith(JUMP_CLIENT_SERVICE_NAME_PREFIX));
+
+
+            if (_service == null)
+            {
+                Logger.Warning("service not installed");
+                _serviceInstalled = false;
+            }
+            else
+            {
+                Logger.Information("service installed");
+                _serviceInstalled = true;
+            }
         }
 
       
@@ -115,7 +120,7 @@ namespace LumenisRemoteService
                 NetworkHelper.TrafficDetected = false;
                 lock (_syncObj)
                 {
-                    SessionStatus = ScreenConnectSessionStatus.SessionIsActive;
+                    SessionStatus = ScreenConnectSessionStatus.SessionConnectedAndActive;
                     _counter = 1;
                 }
             }
@@ -125,13 +130,13 @@ namespace LumenisRemoteService
                 {
                     lock (_syncObj)
                     {
-                        SessionStatus = ScreenConnectSessionStatus.SessionInStandby;
+                        SessionStatus = ScreenConnectSessionStatus.SessionConnectedAndStandby;
                         _counter++;
                     }
                 }
                 else
                 {
-                    // thereis no traffic between client and server
+                    // there is no traffic between client and server
                     Logger.Debug("closing service because of traffic inactivity. inactivity counter is {0}", _counter);
                     lock (_syncObj)
                     {
@@ -156,7 +161,7 @@ namespace LumenisRemoteService
                 MonitorServiceStatus();
                 if (ServiceStatus == ScreeenConnectServiceStatus.Running)
                 {
-                    MonitorSession(); 
+                    NetworkHelper.MonitorSession();
                 }
               
             }
@@ -300,6 +305,7 @@ namespace LumenisRemoteService
                     }
                     else
                     {
+                        CheckServiceInstallation();
                         if (_lastStatus != ScreeenConnectServiceStatus.NotInstalled)
                         {
                             statusChanged = true;
@@ -321,7 +327,7 @@ namespace LumenisRemoteService
             }
         }
 
-       
+
 
         //internal void UserAppISActive()
         //{
@@ -343,36 +349,36 @@ namespace LumenisRemoteService
         /// <summary>
         /// Monitor if port 443 is in used and it's traffic level
         /// </summary>
-        public void MonitorSession()
-        {
-            try
-            {
-                var result = NetworkHelper.GetEthernetAddress();
-                if (result != null && result != string.Empty && result != "0.0.0.0")
-                {
-                    Logger.Information("device received ip address {0}",result);
-                    _receivedIp = true;
-                }
+        //public void MonitorSession()
+        //{
+        //    try
+        //    {
+        //        var result = NetworkHelper.GetEthernetAddress();
+        //        if (result != null && result != string.Empty && result != "0.0.0.0")
+        //        {
+        //            Logger.Information("device received ip address {0}", result);
+        //            _receivedIp = true;
+        //        }
 
-                if (_receivedIp)//check if port 443 is in used
-                {
+        //        if (_receivedIp)//check if port 443 is in used
+        //        {
 
-                    NetworkHelper.CheckIfSessionEstablished();
-                    
-                }
-                else
-                {
-                    SessionStatus = ScreenConnectSessionStatus.CableDisconnected;
-                }
+        //            NetworkHelper.CheckIfSessionEstablished();
+
+        //        }
+        //        else
+        //        {
+        //            SessionStatus = ScreenConnectSessionStatus.CableDisconnected;
+        //        }
 
 
-                Logger.Debug("session status is {0}", SessionStatus);
-            }
-            catch (Exception ex)
-            {
-                Logger.Error("can't continue monitoring the session");
-            }
-        }
+        //        Logger.Debug("session status is {0}", SessionStatus);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Logger.Error("can't continue monitoring the session");
+        //    }
+        //}
 
 
         #endregion 

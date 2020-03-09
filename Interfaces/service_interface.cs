@@ -28,12 +28,12 @@ namespace Interfaces
     {
         [EnumMember]
         None,
+       // [EnumMember]
+        //CableDisconnected,
         [EnumMember]
-        CableDisconnected,
+        SessionConnectedAndStandby,
         [EnumMember]
-        SessionInStandby,
-        [EnumMember]
-        SessionIsActive,
+        SessionConnectedAndActive,
         [EnumMember]
         SessionDisconnected
     }

@@ -140,6 +140,46 @@ namespace LumenisRemoteService
             }
         }
 
+        private static List<GatewayIPAddressInformation> GetMonitored()
+        {
+            List<GatewayIPAddressInformation> gatewaysList = null;
+            try
+            {
+                gatewaysList = new List<GatewayIPAddressInformation>();
+                var cards = System.Net.NetworkInformation.NetworkInterface.GetAllNetworkInterfaces();
+
+                if (cards != null)
+                {
+                    foreach (var card in cards)
+                    {
+                        var address = card.GetIPProperties().GatewayAddresses;
+                        if (address != null)
+                        {
+                            if (address.Count > 0)
+                            {
+                                System.Net.NetworkInformation.GatewayIPAddressInformation gateway = address[0];
+                                gatewaysList.Add(gateway);
+                            }
+                        }
+                    }
+                    if (gatewaysList.Count == 0)
+                    {
+                        //to do: notify of empty gateway and handle user selection
+                    }
+                    if (gatewaysList.Count > 1)
+                    {
+                        //to do: notify of too many interfaces gateways and handle user selection
+                    }
+                }
+                return gatewaysList;
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex);
+                return gatewaysList;
+            }
+        }
+
 
         private static bool _trafficDetected = false;
 
@@ -151,7 +191,7 @@ namespace LumenisRemoteService
 
         public static bool _activated = false;
 
-        public static void CheckIfSessionEstablished()
+        public static void MonitorSession()
         {
             try
             {

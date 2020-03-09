@@ -169,9 +169,9 @@ namespace Support_request_app
             switch (p_enum)
             {
                 case ScreenConnectSessionStatus.None: return "Unknown";
-                case ScreenConnectSessionStatus.CableDisconnected: return "Cable is disconnected";
-                case ScreenConnectSessionStatus.SessionInStandby: return "Session in standby";
-                case ScreenConnectSessionStatus.SessionIsActive: return "Session is active";
+                //case ScreenConnectSessionStatus.CableDisconnected: return "Cable is disconnected";
+                case ScreenConnectSessionStatus.SessionConnectedAndStandby: return "Session in standby";
+                case ScreenConnectSessionStatus.SessionConnectedAndActive: return "Session is active";
                 case ScreenConnectSessionStatus.SessionDisconnected: return "Session disconnected";
                 default: return "Unknown";
             }

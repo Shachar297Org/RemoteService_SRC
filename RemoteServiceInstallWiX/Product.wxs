@@ -27,8 +27,8 @@
 					  <Component Id="ServiceComponent" Guid="7CB1DE56-B5D5-4E8B-9C8E-4998084CD08B">
               <?ifdef Debug ?>
              
-                <File Id='RemoteService' Name='RemoteService.exe' DiskId='1' Source='..\RemoteService\bin\Debug\RemoteService.exe' KeyPath='yes'/>
-                <File Id='RemoteServiceConfig' Name='RemoteService.exe.config' DiskId='1' Source='..\RemoteService\bin\Debug\RemoteService.exe.config'/>
+              <File Id='RemoteService' Name='RemoteService.exe' DiskId='1' Source='..\RemoteService\bin\Debug\RemoteService.exe'/>
+               <File Id='RemoteServiceConfig' Name='RemoteService.exe.config' DiskId='1' Source='..\RemoteService\bin\Debug\RemoteService.exe.config'/>
               <File Id='KernelTraceControl' Name='KernelTraceControl.dll.' DiskId='1' Source='..\RemoteService\bin\Debug\x86\KernelTraceControl.dll'/>
               <File Id='KernelTraceControl.Win61' Name='KernelTraceControl.Win61.dll' DiskId='1' Source='..\RemoteService\bin\Debug\x86\KernelTraceControl.Win61.dll'/>
               <File Id='Media' Name='msdia140.dll' DiskId='1' Source='..\RemoteService\bin\Debug\x86\msdia140.dll'/>
@@ -49,8 +49,8 @@
               <File Id='ServiceToken' Name='ServiceToken.exe' DiskId='1' Source='..\CreateServiceToken\bin\Debug\ServiceToken.exe'/>
               
               <?else?>
-                <File Id='RemoteService' Name='RemoteService.exe' DiskId='1' Source='..\RemoteService\bin\Release\RemoteService.exe' KeyPath='yes'/>
-                <File Id='RemoteServiceConfig' Name='RemoteService.exe.config' DiskId='1' Source='..\RemoteService\bin\Release\RemoteService.exe.config'/>
+              <File Id='RemoteService' Name='RemoteService.exe' DiskId='1' Source='..\RemoteService\bin\Release\RemoteService.exe'/>
+              <File Id='RemoteServiceConfig' Name='RemoteService.exe.config' DiskId='1' Source='..\RemoteService\bin\Release\RemoteService.exe.config'/>
               <File Id='KernelTraceControl' Name='KernelTraceControl.dll.' DiskId='1' Source='..\RemoteService\bin\Debug\x86\KernelTraceControl.dll'/>
               <File Id='KernelTraceControl.Win61' Name='KernelTraceControl.Win61.dll' DiskId='1' Source='..\RemoteService\bin\Debug\x86\KernelTraceControl.Win61.dll'/>
               <File Id='Media' Name='msdia140.dll' DiskId='1' Source='..\RemoteService\bin\Debug\x86\msdia140.dll'/>
@@ -122,6 +122,7 @@
     <Binary Id='hasp_win'  SourceFile='..\ThirdPartyFiles\hasp_windows_demo.dll' />
     <Binary Id='hasp_64'  SourceFile='..\ThirdPartyFiles\hasp_windows_x64_113740.dll' />
     <Binary Id='haswp_net'  SourceFile='..\ThirdPartyFiles\hasp_net_windows.dll' />
+    <Binary Id='LicenseApi'  SourceFile='..\LicenseApi\bin\Release\LicenseApi.dll' />
    
 
     <?ifdef Debug ?>
