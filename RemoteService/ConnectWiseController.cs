@@ -20,6 +20,8 @@ namespace LumenisRemoteService
     {
         private static readonly ILogger Logger = LoggerFactory.Default.GetCurrentClassLogger();
         private readonly string JUMP_CLIENT_SERVICE_NAME_PREFIX;
+        private readonly int MONITORED_PORT;
+        private const int DEFAULT_PORT = 8041;
         private ServiceController _service = null;
         private bool _serviceInstalled = false;
         private bool _requestForSupportWasMade = false; //signal if the user app sent request for support
@@ -68,8 +70,16 @@ namespace LumenisRemoteService
 
 
                 TRAFFICMONITORINTERVAL = new TimeSpan(0, 0, interval).TotalMilliseconds;
-
-
+                //Monitored port must be fixed for all installations. this section of code support rare cases of port modification that 
+                //will affect all Lumenis installations.
+                if (Int32.TryParse(ConfigurationManager.AppSettings["MonitoredPort"], out int val))
+                {
+                    MONITORED_PORT = val;
+                }
+                else
+                {
+                    MONITORED_PORT = DEFAULT_PORT;
+                }
 
                 JUMP_CLIENT_SERVICE_NAME_PREFIX = Convert.ToString(ConfigurationManager.AppSettings["MonitoredProcessName"]);//todo name should also be fetched from configuration file
 
@@ -161,7 +171,7 @@ namespace LumenisRemoteService
                 MonitorServiceStatus();
                 if (ServiceStatus == ScreeenConnectServiceStatus.Running)
                 {
-                    NetworkHelper.MonitorSession();
+                    NetworkHelper.MonitorSession(MONITORED_PORT);
                 }
               
             }

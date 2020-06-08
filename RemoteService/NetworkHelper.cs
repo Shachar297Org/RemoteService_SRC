@@ -191,26 +191,24 @@ namespace LumenisRemoteService
 
         public static bool _activated = false;
 
-        public static void MonitorSession()
+        public static void MonitorSession(int p_port)
         {
             try
             {
-                int port = 443; //<--- This is your value
-                
+              
                 // Evaluate current system tcp connections. This is the same information provided
                 // by the netstat command line application, just in .Net strongly-typed object
                 // form.  We will look through the list, and if our port we would like to use
                 // in our TcpClient is occupied, we will set isAvailable to false.
                 IPGlobalProperties ipGlobalProperties = IPGlobalProperties.GetIPGlobalProperties();
                 TcpConnectionInformation[] tcpConnInfoArray = ipGlobalProperties.GetActiveTcpConnections();
-             // TcpStatistics statistics =  ipGlobalProperties.GetTcpIPv4Statistics();
                 
                 foreach (TcpConnectionInformation tcpi in tcpConnInfoArray)
                 {
-                    if (tcpi.RemoteEndPoint.Port == port)
+                    if (tcpi.RemoteEndPoint.Port == p_port)
                     {
                         
-                        Logger.Debug("port 443 state is {0}",tcpi.State.ToString());
+                        Logger.Debug("port {0} state is {1}", p_port, tcpi.State.ToString());
                         if(tcpi.State == TcpState.Established)
                         {
                             if (!_activated)
