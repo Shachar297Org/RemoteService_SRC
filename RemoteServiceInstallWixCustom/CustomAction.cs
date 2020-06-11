@@ -16,6 +16,7 @@ namespace RemoteServiceInstallWixCustom
 {
     public class CustomActions
     {
+       
         // private const string VOLUME = @"\\?\GLOBALROOT\Device\HarddiskVolume1";
         // const string INSTALL_DIR = @"D:\Program Files\Lumenis\";
         // const string TEMP_APP_DIR = "LSI.tmp";
@@ -45,15 +46,39 @@ namespace RemoteServiceInstallWixCustom
         //    }
         //}
 
+        public static void Test()
+        {
+            string error = string.Empty;
+            if (CheckHasp())
+            {
+
+              
+                //session.Log("Hasp OK");
+                string compName = BuildComputerName();
+             
+                // session.Log(string.Format("Comp Name is {0}", compName));
+
+            }
+            else
+            {
+              
+
+            }
+
+            string version;
+            string versionCheck;
+            CheckImageVersion(null, out version, out versionCheck);
+        }
+
         [CustomAction]
         public static ActionResult CheckPrerequisites(Session session )
         {
-
+            string error = string.Empty;
             //session["HASP_INSERTED"] = "1";
             //session["IMAGE_VERSION_OK"] = "1";
-            //return ActionResult.Success;
+           // return ActionResult.Success;
 
-            session.Log("Begin CheckPrerequisites");
+           // session.Log("Begin CheckPrerequisites");
             //LogRecord("Begin CheckPrerequisites", session);
 
             //if (UwfApi.IsUwfEnabled())//doesn't work at all on WIN7
@@ -78,9 +103,10 @@ namespace RemoteServiceInstallWixCustom
             else
             {
                 session.Log("Hasp Failed");
+                //session["HASP_INSERTED"] = "1";//should be used to debug because when the value is 1 Computer Name label is shown.
                 session["HASP_INSERTED"] = "0";
-                session["COMPUTER_NAME"] = "";
-               
+                session["COMPUTER_NAME"] = "Hasp Failed";
+
             }
 
 
@@ -91,6 +117,10 @@ namespace RemoteServiceInstallWixCustom
             string version;
             string versionCheck;
             CheckImageVersion(session, out version, out versionCheck);
+            if(error != string.Empty)
+            {
+                version = error;
+            }
             session["IMAGE_VERSION"] = version;
             session["IMAGE_VERSION_OK"] = versionCheck;
             session["PREREQ_FINISHED"] = "1";
@@ -235,14 +265,16 @@ namespace RemoteServiceInstallWixCustom
         //    }
         //}
 
-        private static bool CheckHasp(Session session)
+        private static bool CheckHasp(Session session = null)
         {
+          
             try
             {
                 SecurityKey securityKey = new SecurityKey();
                 if (!securityKey.UseFeature(SecurityKey.MAIN_FEATURE_ID))
                 {
-                  //  session["COMPUTER_NAME"] = "false";
+                      session["COMPUTER_NAME"] = string.Format("feature {0} not exis", SecurityKey.MAIN_FEATURE_ID) ;
+                 
                     return false;
                 }
                // session["COMPUTER_NAME"] = "true";
@@ -250,7 +282,8 @@ namespace RemoteServiceInstallWixCustom
             }
             catch (Exception ex)
             {
-               // session["COMPUTER_NAME"] = ex.Message;
+                session["COMPUTER_NAME"] = ex.Message;
+              
                 return false;
             }
         }
@@ -265,9 +298,10 @@ namespace RemoteServiceInstallWixCustom
                 string serialNumber = SecurityKey.SerialNumber.TrimEnd(new char[] { '\0' });
                 return serialNumber + "_" + partNumber;
             }
-            catch
+            catch(Exception ex)
             {
-                return "";
+              
+                return ex.Message;
             }
         }
 
@@ -275,7 +309,7 @@ namespace RemoteServiceInstallWixCustom
         {
             // versionCheck = "0";
             versionCheck = "1"; // Ignore version check on Windows 10
-            session.Log("Check image version");
+            session?.Log("Check image version");
             try
             {
                 object ver = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64).
@@ -305,7 +339,7 @@ namespace RemoteServiceInstallWixCustom
             {
                 version = "Not set";
             }
-            session.Log(string.Format("checked version is {0}",version));
+            session?.Log(string.Format("checked version is {0}",version));
         }
 
         /// <summary>

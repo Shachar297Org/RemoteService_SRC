@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Deployment.WindowsInstaller;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,9 +9,10 @@ namespace RemoteServiceInstallWixCustom
 {
     class Program
     {
-        //static void Main(string[] args)
-        //{
-        //    CustomActions.CheckPrerequisites();
-        //}
+        static void Main(string[] args)
+        {
+
+            CustomActions.Test();
+        }
     }
 }

@@ -5,3 +5,5 @@
 1. modify ScreenConnectSessionStatus enum names to something more accurate.
 2. fix bug where after installing remote service + connectWise and without restart it doesn't turn off ConnectWise service.
 3. ScreenConnectSessionStatus.CableDisconnected removed.
+
+setup file can be built in x86 debug only

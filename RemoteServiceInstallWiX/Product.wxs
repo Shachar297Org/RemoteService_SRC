@@ -6,7 +6,7 @@
     <?define installationType="" ?>
   <?endif ?>
   
-	<Product Id="D57D8A24-1DD2-41FC-9DAA-4100CEADE80E" Name="Lumenis Remote Service $(var.installationType) v2.0.6" Language="1033" Version="2.0.6" Manufacturer="Lumenis Ltd."
+	<Product Id="D57D8A24-1DD2-41FC-9DAA-4100CEADE80E" Name="Lumenis Remote Service $(var.installationType) v3.0.0" Language="1033" Version="2.0.6" Manufacturer="Lumenis Ltd."
            UpgradeCode="02E714BA-392F-43D1-B585-315455582A90">
 
     <Package Id="*" Description="Lumenis Remote Service Installer" InstallerVersion="200" Compressed="yes" />
@@ -25,7 +25,7 @@
           <Directory Id="INSTALLLOCATION" Name="Remote Service">
           
 					  <Component Id="ServiceComponent" Guid="7CB1DE56-B5D5-4E8B-9C8E-4998084CD08B">
-              <?ifdef Debug ?>
+              <!--<?ifdef Debug ?>
              
               <File Id='RemoteService' Name='RemoteService.exe' DiskId='1' Source='..\RemoteService\bin\Debug\RemoteService.exe'/>
                <File Id='RemoteServiceConfig' Name='RemoteService.exe.config' DiskId='1' Source='..\RemoteService\bin\Debug\RemoteService.exe.config'/>
@@ -48,12 +48,12 @@
               <File Id='TraceTeloggerLib' Name='TraceReloggerLib.dll' DiskId='1' Source='..\RemoteService\bin\Debug\TraceReloggerLib.dll'/>
               <File Id='ServiceToken' Name='ServiceToken.exe' DiskId='1' Source='..\CreateServiceToken\bin\Debug\ServiceToken.exe'/>
               
-              <?else?>
+              <?else?>-->
               <File Id='RemoteService' Name='RemoteService.exe' DiskId='1' Source='..\RemoteService\bin\Release\RemoteService.exe'/>
               <File Id='RemoteServiceConfig' Name='RemoteService.exe.config' DiskId='1' Source='..\RemoteService\bin\Release\RemoteService.exe.config'/>
-              <File Id='KernelTraceControl' Name='KernelTraceControl.dll.' DiskId='1' Source='..\RemoteService\bin\Debug\x86\KernelTraceControl.dll'/>
-              <File Id='KernelTraceControl.Win61' Name='KernelTraceControl.Win61.dll' DiskId='1' Source='..\RemoteService\bin\Debug\x86\KernelTraceControl.Win61.dll'/>
-              <File Id='Media' Name='msdia140.dll' DiskId='1' Source='..\RemoteService\bin\Debug\x86\msdia140.dll'/>
+              <File Id='KernelTraceControl' Name='KernelTraceControl.dll.' DiskId='1' Source='..\RemoteService\bin\Release\x86\KernelTraceControl.dll'/>
+              <File Id='KernelTraceControl.Win61' Name='KernelTraceControl.Win61.dll' DiskId='1' Source='..\RemoteService\bin\Release\x86\KernelTraceControl.Win61.dll'/>
+              <File Id='Media' Name='msdia140.dll' DiskId='1' Source='..\RemoteService\bin\Release\x86\msdia140.dll'/>
               <File Id='WinSCP' Name='WinSCP.dll' DiskId='1' Source='..\ThirdPartyFiles\WinSCP.dll'/>
               <File Id='gacutil' Name='gacutil.exe' DiskId='1' Source='..\ThirdPartyFiles\gacutil.exe'/>
               <File Id='interfaces' Name='interfaces.dll' DiskId='1' Source='..\RemoteService\bin\Release\Interfaces.dll'/> <!--assembly have to be sign in order to be registered in GAC-->
@@ -63,13 +63,21 @@
               <File Id='Dia2Lib' Name='Dia2Lib.dll.' DiskId='1' Source='..\RemoteService\bin\Release\Dia2Lib.dll'/>
               <File Id='FastSerialization' Name='Microsoft.Diagnostics.FastSerialization.dll' DiskId='1' Source='..\RemoteService\bin\Release\Microsoft.Diagnostics.FastSerialization.dll'/>
               <File Id='TraceEvent' Name='Microsoft.Diagnostics.Tracing.TraceEvent.dll' DiskId='1' Source='..\RemoteService\bin\Release\Microsoft.Diagnostics.Tracing.TraceEvent.dll'/>
-              <File Id='UnitT' Name='Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll' DiskId='1' Source='..\RemoteService\bin\Debug\Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll'/>
+              <!--<File Id='UnitT' Name='Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll' DiskId='1' Source='..\RemoteService\bin\Release\Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll'/>-->
               <File Id='OSExtentions' Name='OSExtensions.dll' DiskId='1' Source='..\RemoteService\bin\Release\OSExtensions.dll'/>
               <File Id='RemoteServiceAPI' Name='RemoteServiceApi.dll' DiskId='1' Source='..\RemoteService\bin\Release\RemoteServiceApi.dll'/><!--assembly have to be sign in order to be registered in GAC-->
               <File Id='RemoteServiceAPIConfig' Name='RemoteServiceApi.dll.config' DiskId='1' Source='..\RemoteService\bin\Release\RemoteServiceApi.dll.config'/>
               <File Id='TraceTeloggerLib' Name='TraceReloggerLib.dll' DiskId='1' Source='..\RemoteService\bin\Release\TraceReloggerLib.dll'/>
               <File Id='ServiceToken' Name='ServiceToken.exe' DiskId='1' Source='..\CreateServiceToken\bin\Release\ServiceToken.exe'/>
-              <?endif?>
+              <!--<File Id='LicenseApi' Name='LicenseApi.dll' DiskId='1' Source='..\LicenseApi\bin\Release\LicenseApi.dll'/>-->
+              <!--<File Id='api' Name='apidsp_windows.dll' DiskId='1' Source='..\ThirdPartyFiles\apidsp_windows.dll'/>
+              <File Id='api_64' Name='apidsp_windows_x64.dll' DiskId='1' Source='..\ThirdPartyFiles\apidsp_windows_x64.dll'/>
+              <File Id='hasp' Name='hasp_windows_113740.dll' DiskId='1' Source='..\ThirdPartyFiles\hasp_windows_113740.dll'/>
+              <File Id='hasp_win' Name='hasp_windows_demo.dll' DiskId='1' Source='..\ThirdPartyFiles\hasp_windows_demo.dll'/>
+              <File Id='hasp_64' Name='hasp_windows_x64_113740.dll' DiskId='1' Source='..\ThirdPartyFiles\hasp_windows_x64_113740.dll'/>
+              <File Id='haswp_net' Name='hasp_net_windows.dll' DiskId='1' Source='..\ThirdPartyFiles\hasp_net_windows.dll'/>-->
+              
+              <!--<?endif?>-->
               
               
 
@@ -116,22 +124,29 @@
     
 
     <!-- Define custom actions and corresponding custom action DLLs when required -->
-    <Binary Id='api'  SourceFile='..\ThirdPartyFiles\apidsp_windows.dll' />
+    <!--<Binary Id='api'  SourceFile='..\ThirdPartyFiles\apidsp_windows.dll' />
     <Binary Id='api_64'  SourceFile='..\ThirdPartyFiles\apidsp_windows_x64.dll' />
     <Binary Id='hasp'  SourceFile='..\ThirdPartyFiles\hasp_windows_113740.dll' />
     <Binary Id='hasp_win'  SourceFile='..\ThirdPartyFiles\hasp_windows_demo.dll' />
     <Binary Id='hasp_64'  SourceFile='..\ThirdPartyFiles\hasp_windows_x64_113740.dll' />
     <Binary Id='haswp_net'  SourceFile='..\ThirdPartyFiles\hasp_net_windows.dll' />
-    <Binary Id='LicenseApi'  SourceFile='..\LicenseApi\bin\Release\LicenseApi.dll' />
+    <Binary Id='LicenseApi'  SourceFile='..\LicenseApi\bin\x86\Setup\LicenseApi.dll' />-->
    
 
-    <?ifdef Debug ?>
-      <Binary Id='WixCustom'  SourceFile='..\RemoteServiceInstallWixCustom\bin\Debug\RemoteServiceInstallWixCustom.CA.dll' />
+    <!--<?ifdef Setup ?>-->
+      <Binary Id='WixCustom'  SourceFile='..\RemoteServiceInstallWixCustom\bin\x86\Setup\RemoteServiceInstallWixCustom.CA.dll' />
+    <!--<Binary Id='api'  SourceFile='..\ThirdPartyFiles\apidsp_windows.dll' />
+    <Binary Id='api_64'  SourceFile='..\ThirdPartyFiles\apidsp_windows_x64.dll' />
+    <Binary Id='hasp'  SourceFile='..\ThirdPartyFiles\hasp_windows_113740.dll' />
+    <Binary Id='hasp_win'  SourceFile='..\ThirdPartyFiles\hasp_windows_demo.dll' />
+    <Binary Id='hasp_64'  SourceFile='..\ThirdPartyFiles\hasp_windows_x64_113740.dll' />
+    <Binary Id='haswp_net'  SourceFile='..\ThirdPartyFiles\hasp_net_windows.dll' />
+    <Binary Id='LicenseApi'  SourceFile='..\LicenseApi\bin\x86\Setup\LicenseApi.dll' />-->
     
-    <?else?>
-      <Binary Id='WixCustom'  SourceFile='..\RemoteServiceInstallWixCustom\bin\Release\RemoteServiceInstallWixCustom.CA.dll' />
+    <!--<?else?>
+      <Binary Id='WixCustom'  SourceFile='..\RemoteServiceInstallWixCustom\bin\x64\Release\RemoteServiceInstallWixCustom.CA.dll' />-->
    
-    <?endif?>
+    <!--<?endif?>-->
 
    
     <CustomAction Id='CheckPrereq' BinaryKey='WixCustom' DllEntry='CheckPrerequisites' />
