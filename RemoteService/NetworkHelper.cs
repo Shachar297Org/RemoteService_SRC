@@ -12,9 +12,22 @@ using System.Threading.Tasks;
 
 namespace LumenisRemoteService
 {
+    public class SessionEventArgs:EventArgs
+    {
+
+    }
+
+    
+
     class NetworkHelper
     {
         private static readonly ILogger Logger = LoggerFactory.Default.GetCurrentClassLogger();
+
+        /// <summary>
+        /// false means some network connection problem to the portal
+        /// </summary>
+        public static event Action<bool> _networkState;
+        
 
 
         /// <summary>
@@ -196,6 +209,7 @@ namespace LumenisRemoteService
             try
             {
               
+                
                 // Evaluate current system tcp connections. This is the same information provided
                 // by the netstat command line application, just in .Net strongly-typed object
                 // form.  We will look through the list, and if our port we would like to use
@@ -213,9 +227,11 @@ namespace LumenisRemoteService
                         {
                             if (!_activated)
                             {
+                                _networkState(true);//signal that there is connection to the portal
                                 Logger.Debug("traffic monitor activated");
                                 NetworkPerformanceReporter.Create();
                                 NetworkPerformanceReporter.TracfficDetected += NetworkPerformanceReporter_TracfficDetected;
+                                NetworkPerformanceReporter.Disconnected += NetworkPerformanceReporter_Disconnected;
                                 _activated = true;
                             }
 
@@ -227,21 +243,21 @@ namespace LumenisRemoteService
             }
             catch (Exception ex)
             {
+                _activated = false;
+                _networkState(false);
                 Logger.Error(ex);
-                throw;
             }
+        }
+
+        private static void NetworkPerformanceReporter_Disconnected(bool obj)
+        {
+            _networkState(false);
+            _activated = false;
         }
 
         private static void NetworkPerformanceReporter_TracfficDetected(bool obj)
         {
-            try
-            {
-                _trafficDetected = true;
-            }
-            catch (Exception ex)
-            {
-                Logger.Error(ex);
-            }
+            _trafficDetected = obj;
         }
     }
 
@@ -255,10 +271,12 @@ namespace LumenisRemoteService
 
         public static  event Action<bool> TracfficDetected;
 
+        public static event Action<bool> Disconnected;
+
         private class Counters
         {
-            public long Received;
-            public long Sent;
+            public long Received = 0;
+            public long Sent = 0;
         }
 
 
@@ -288,6 +306,7 @@ namespace LumenisRemoteService
             Task.Run(() => StartEtwSession());
         }
 
+        
         private void StartEtwSession()
         {
             try
@@ -303,7 +322,7 @@ namespace LumenisRemoteService
                 var processId = process[0].Id;
                 ResetCounters();
                 string eventSessionName = string.Empty;
-               if(Environment.OSVersion.VersionString.Contains("6.2"))
+                if (Environment.OSVersion.VersionString.Contains("6.2"))
                 {
                     //win 10 embedded
                     eventSessionName = "MyKernelAndClrEventsSession";
@@ -313,27 +332,35 @@ namespace LumenisRemoteService
                     //win 7 embedded
                     eventSessionName = "NT Kernel Logger";
                 }
-                Logger.Information(string.Format("event session name is {0}",eventSessionName));
+                Logger.Information(string.Format("event session name is {0}", eventSessionName));
                 using (m_EtwSession = new TraceEventSession(eventSessionName))
                 {
 
-                 
+
                     try
                     {
-                        m_EtwSession.EnableKernelProvider(KernelTraceEventParser.Keywords.NetworkTCPIP,KernelTraceEventParser.Keywords.None);
-                    
-                    
+                        m_EtwSession.EnableKernelProvider(KernelTraceEventParser.Keywords.NetworkTCPIP, KernelTraceEventParser.Keywords.None);
+
+
                         m_EtwSession.Source.Kernel.TcpIpRecv += data =>
                         {
                             if (data.ProcessID == processId)
                             {
                                 lock (m_Counters)
                                 {
-                                        m_Counters.Received += data.size;
-                                        Logger.Information("received size is : {0}", m_Counters.Received.ToString());
+                                    m_Counters.Received += data.size;
+                                    //System.Diagnostics.Debug.WriteLine($"recieved data size {data.size}");
+                                    //Logger.Information("received size is : {0}", m_Counters.Received.ToString());
+                                    if (data.size != 0)
+                                    {
                                         TracfficDetected(true);
-                                   
-
+                                    }
+                                    else
+                                    {
+                                        TracfficDetected(false);
+                                        Disconnected(true);//? maybe there are normal and valid scenario where 0 bytes are sent
+                                        Logger.Information("received zero bytes. single of portal disconnection");
+                                    }
                                 }
                             }
                         };

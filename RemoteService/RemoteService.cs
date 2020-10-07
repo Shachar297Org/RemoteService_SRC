@@ -5,71 +5,7 @@ using System.ServiceModel;
 
 namespace LumenisRemoteService
 {
-    //[ServiceContract]
-    //public interface IRemoteService
-    //{
-    //    [OperationContract]
-    //     RemoteStatus GetStatus();
-
-    //    [OperationContract]
-    //     void StartConnection();
-
-
-    //    [OperationContract]
-    //     void StopConnection();
-
-
-
-    //    [OperationContract]
-    //     void Enable(bool enable);
-
-
-
-    //    [OperationContract]
-    //     void CreateFeature(int featureId);
-
-
-
-    //    [OperationContract]
-    //     bool HasFeature(int featureId);
-
-
-
-    //    [OperationContract]
-    //     bool ExtendFeature(int featureId);
-
-
-
-    //    [OperationContract]
-    //     void RemoveFeature(int featureId);
-
-
-    //    #region ConnectWise
-
-    //    [OperationContract]
-    //    bool StartScreenConnect();
-
-    //    [OperationContract]
-
-    //    bool StopService();
-
-    //    [OperationContract]
-
-    //    string GetScreenConnectStatus();
-
-
-    //    #endregion
-
-    //}
-
-    //[DataContract]
-    //public struct RemoteStatus
-    //{
-    //    [DataMember]
-    //    public bool IsConnected;
-    //    [DataMember]
-    //    public bool IsEnabled;
-    //}
+   
 
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single)]
     public partial class RemoteService:IRemoteService
@@ -78,8 +14,7 @@ namespace LumenisRemoteService
         {
             return new RemoteStatus()
             {
-                // IsConnected = ActionDispatcher.Instance.IsRunning(),
-                // IsEnabled = ActionDispatcher.Instance.IsEnabled
+               
                 IsConnected = false,
                 IsEnabled = false
             };

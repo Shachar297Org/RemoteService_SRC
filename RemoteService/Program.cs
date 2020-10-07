@@ -38,14 +38,7 @@ namespace LumenisRemoteService
 
             }
 
-            RegisterToGAC();
-
-            //System.EnterpriseServices.Internal.Publish gg = new Publish();
-            //gg.GacInstall("NLog.dll");
-            //gg.GacInstall("COM.dll");
-            //gg.GacInstall("Interfaces.dll");
-            //gg.GacInstall("Logging.dll");
-            //gg.GacInstall("RemoteServiceApi.dll");
+           
 #if TestApp
 
             LumenisRemoteServiceApp.Start();
