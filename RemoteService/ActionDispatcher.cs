@@ -64,8 +64,8 @@ namespace LumenisRemoteService
             }
             catch (Exception ex)
             {
-                EventLog.WriteEntry(
-                    LumenisService.Name, string.Format("FindJumpClietService Exception: {0}", ex.Message), EventLogEntryType.Error);
+               // EventLog.WriteEntry(
+                 //   LumenisService.Name, string.Format("FindJumpClietService Exception: {0}", ex.Message), EventLogEntryType.Error);
             }
         }
 
@@ -76,8 +76,8 @@ namespace LumenisRemoteService
                 return false;
             }
             _bomgarService.Refresh();
-            EventLog.WriteEntry(
-                LumenisService.Name, string.Format("Bomgar Service Status = {0}", _bomgarService.Status), EventLogEntryType.Information);
+          //  EventLog.WriteEntry(
+            //    LumenisService.Name, string.Format("Bomgar Service Status = {0}", _bomgarService.Status), EventLogEntryType.Information);
             return _bomgarService.Status == ServiceControllerStatus.Running;
         }
 

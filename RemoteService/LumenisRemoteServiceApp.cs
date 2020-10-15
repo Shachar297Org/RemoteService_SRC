@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Logging;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -9,9 +10,10 @@ namespace LumenisRemoteService
 {
     class LumenisRemoteServiceApp
     {
+        private static readonly ILogger Logger = LoggerFactory.Default.GetCurrentClassLogger();
         private static ServiceHost _host = null;
         private const string LOG = "Application";
-        private static string _serviceName;
+       // private static string _serviceName;
 
        // public LumenisRemoteServiceApp()
        // {
@@ -20,7 +22,7 @@ namespace LumenisRemoteService
 
         internal static string Name
         {
-            get { return _serviceName; }
+            get { return "test"; }
         }
 
         static public void Start()
@@ -34,10 +36,18 @@ namespace LumenisRemoteService
                 // Create the ServiceHost.
                 _host = new ServiceHost(typeof(RemoteService));
                 _host.Open();
+                Logger.Information("service host started");
+                System.Threading.Thread.Sleep(5000);
+                ServiceClient client = new ServiceClient();//start internal WCF client which make sure remote service will trun off ScreenConnect service
+               
+
+
+
 
             }
             catch (Exception ex)
             {
+                Logger.Error(ex);
                 // EventLog.WriteEntry(ServiceName, string.Format("OnStart Exception: {0}", ex.ToString()), EventLogEntryType.Error);
             }
         }

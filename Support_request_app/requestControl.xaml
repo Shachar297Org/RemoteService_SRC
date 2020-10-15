@@ -1,0 +1,30 @@
+﻿<UserControl x:Class="Support_request_app.requestControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Support_request_app"
+             x:Name="req_elem"
+             mc:Ignorable="d" 
+             d:DesignHeight="250" d:DesignWidth="250">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+          
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <StackPanel>
+            <Button Content="Invite Support" Click="Invite_click" Margin="0,10,0,0"/>
+            <Button Content="Stop Support" Click="Stop_Click" Margin="0,10,0,0"/>
+            <!--<TextBlock Text="Service Status" Margin="0,10,0,0"/>
+            <TextBox Text="{Binding RequestSupport.ServiceStatus,ElementName=req_elem}" Margin="0,10,0,0"/>-->
+            <TextBlock Text="Session Status" Margin="0,10,0,0"/>
+            <TextBox Text="{Binding RequestSupport.SessionStatus,ElementName=req_elem}" Margin="0,10,0,0"/>
+            <!--<Button Content="Reset SessionTime" Click="ResetSessionTime_Click" Margin="0,10,0,0"/>
+            <TextBlock Text="Remaining session time" Margin="0,10,0,0"/>
+            <TextBox Text="{Binding RequestSupport.SessionTimeLeft,ElementName=req_elem}" Margin="0,10,0,0"/>-->
+        </StackPanel>
+    </Grid>
+</UserControl>

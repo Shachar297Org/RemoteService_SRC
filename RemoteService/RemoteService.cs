@@ -1,69 +1,60 @@
-﻿using System.Runtime.Serialization;
+﻿using Interfaces;
+using Logging;
+using System.Runtime.Serialization;
 using System.ServiceModel;
 
 namespace LumenisRemoteService
 {
-    [DataContract]
-    public struct RemoteStatus
-    {
-        [DataMember]
-        public bool IsConnected;
-        [DataMember]
-        public bool IsEnabled;
-    }
+   
 
-    [ServiceContract]
-    public class RemoteService
+    [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single)]
+    public partial class RemoteService:IRemoteService
     {
-        [OperationContract]
         public RemoteStatus GetStatus()
         {
             return new RemoteStatus()
             {
-                IsConnected = ActionDispatcher.Instance.IsRunning(),
-                IsEnabled = ActionDispatcher.Instance.IsEnabled
+               
+                IsConnected = false,
+                IsEnabled = false
             };
         }
 
-        [OperationContract]
         public void StartConnection()
         {
-            ActionDispatcher.Instance.StartService();
+           // ActionDispatcher.Instance.StartService();
         }
 
-        [OperationContract]
         public void StopConnection()
         {
-            ActionDispatcher.Instance.StopService();
+           // ActionDispatcher.Instance.StopService();
         }
 
-        [OperationContract]
         public void Enable(bool enable)
         {
-            ActionDispatcher.Instance.Enable(enable);
+          //  ActionDispatcher.Instance.Enable(enable);
         }
 
-        [OperationContract]
         public void CreateFeature(int featureId)
         {
+            Logger.Information($"CreateFeature command received {featureId}");
             ServiceToken.Instance().Create(featureId);
         }
 
-        [OperationContract]
         public bool HasFeature(int featureId)
         {
             return ServiceToken.Instance().Exists(featureId);
         }
 
-        [OperationContract]
         public bool ExtendFeature(int featureId)
         {
             return ServiceToken.Instance().Extend(featureId);
         }
 
-        [OperationContract]
+       // [OperationContract]
         public void RemoveFeature(int featureId)
         {
+            Logger.Information($"RemoveFeature command received {featureId}");
             ServiceToken.Instance().Remove(featureId);
         }
 

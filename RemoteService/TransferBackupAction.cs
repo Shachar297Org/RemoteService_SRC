@@ -11,7 +11,7 @@ namespace LumenisRemoteService
         private const string HOST_NAME = "support.lumenis.com";
         private const string USER_NAME = "deviceuser";
         private const string PASSWORD = "Dev@User1";
-        
+
         private string fileToUpload;
 
         public TransferBackupAction(string[] args)

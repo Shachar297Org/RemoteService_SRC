@@ -7,6 +7,7 @@ namespace Limenis.ServiceToken
     {
         static void Main(string[] args)
         {
+            //System.Threading.Thread.Sleep(30000);
             // Parse parameters
             if (args.Length < 1)
             {
@@ -18,12 +19,14 @@ namespace Limenis.ServiceToken
             int featureIndex = 0;
             if (args.Length > 1)
             {
-                if (args[0][0] != '-' && args[0][0] != '/')
-                {
-                    Usage();
-                    return;
-                }
-                switch (args[0][1])
+                //if (args[0][0] != '-' && args[0][0] != '/')
+                //{
+                //    Usage();
+                //    return;
+                //}
+
+                char val = args[0].ToLower().ToCharArray()[0];
+                switch (val)
                 {
                     case 'c':
                         create = true;
@@ -36,6 +39,11 @@ namespace Limenis.ServiceToken
                         return;
                 }
                 featureIndex++;
+            }
+            else
+            {
+                Usage();
+                return;
             }
 
             ushort featureId = 10001;
@@ -50,7 +58,10 @@ namespace Limenis.ServiceToken
             try
             {
                 RemoteAPI remoteApi = new RemoteAPI();
+
+               // remoteApi.StartClient();
                 remoteApi.Open();
+               
                 if (create)
                 {
                     remoteApi.CreateFeature(featureId);
@@ -65,6 +76,7 @@ namespace Limenis.ServiceToken
             {
                 Console.Error.WriteLine("Cannot create service token: {0}", ex.Message);
             }
+           // Console.ReadKey();
         }
 
         private static void Usage()

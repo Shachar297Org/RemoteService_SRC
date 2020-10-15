@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Threading;
 using System.Windows;
 using Lumenis.RemoteServiceApi;
-using Lumenis.RemoteServiceApi.LumenisRemoteService;
+//using Lumenis.RemoteServiceApi.LumenisRemoteService;
 using System.ServiceProcess;
 using System.Linq;
 

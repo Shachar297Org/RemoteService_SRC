@@ -38,7 +38,7 @@
         <Control Id="ComputerNameLabel" Type="Text" X="45" Y="120" Width="100" Height="15" TabSkip="no" Text="New Computer Name: ">
           <Condition Action="show">HASP_INSERTED = 1</Condition>
         </Control>
-        <Control Id="ComputerNameOkLabel" Type="Text" X="135" Y="120" Width="100" Height="15" TabSkip="no" Text="[COMPUTER_NAME]" Hidden="yes">
+        <Control Id="ComputerNameOkLabel" Type="Text" X="135" Y="120" Width="250" Height="150" TabSkip="no" Text="[COMPUTER_NAME]" Hidden="yes">
           <Condition Action="show">HASP_INSERTED = 1</Condition>
         </Control>
         <Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Text="&amp;Back">
