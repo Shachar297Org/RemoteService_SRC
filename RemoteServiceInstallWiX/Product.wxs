@@ -6,7 +6,7 @@
     <?define installationType="" ?>
   <?endif ?>
   
-	<Product Id="D57D8A24-1DD2-41FC-9DAA-4100CEADE80E" Name="Lumenis Remote Service $(var.installationType) v3.0.0" Language="1033" Version="3.0.0" Manufacturer="Lumenis Ltd."
+	<Product Id="D57D8A24-1DD2-41FC-9DAA-4100CEADE80E" Name="Lumenis Remote Service $(var.installationType) v3.0.1" Language="1033" Version="3.0.1" Manufacturer="Lumenis Ltd."
            UpgradeCode="02E714BA-392F-43D1-B585-315455582A90">
 
     <Package Id="*" Description="Lumenis Remote Service Installer" InstallerVersion="200" Compressed="yes" />
@@ -16,7 +16,7 @@
       <![CDATA[D:\]]>
     </Property>
     <Property Id="WIXUI_INSTALLDIR" Value="INSTALLLOCATION" />
-    <!--<Property Id="BOMGAR_INSTALLED" Value="0"/>-->
+   
     
     <!-- Define components and their locations-->
     <Directory Id="TARGETDIR" Name="SourceDir">
@@ -63,19 +63,12 @@
               <File Id='Dia2Lib' Name='Dia2Lib.dll.' DiskId='1' Source='..\RemoteService\bin\Release\Dia2Lib.dll'/>
               <File Id='FastSerialization' Name='Microsoft.Diagnostics.FastSerialization.dll' DiskId='1' Source='..\RemoteService\bin\Release\Microsoft.Diagnostics.FastSerialization.dll'/>
               <File Id='TraceEvent' Name='Microsoft.Diagnostics.Tracing.TraceEvent.dll' DiskId='1' Source='..\RemoteService\bin\Release\Microsoft.Diagnostics.Tracing.TraceEvent.dll'/>
-              <!--<File Id='UnitT' Name='Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll' DiskId='1' Source='..\RemoteService\bin\Release\Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll'/>-->
               <File Id='OSExtentions' Name='OSExtensions.dll' DiskId='1' Source='..\RemoteService\bin\Release\OSExtensions.dll'/>
               <File Id='RemoteServiceAPI' Name='RemoteServiceApi.dll' DiskId='1' Source='..\RemoteService\bin\Release\RemoteServiceApi.dll'/><!--assembly have to be sign in order to be registered in GAC-->
               <File Id='RemoteServiceAPIConfig' Name='RemoteServiceApi.dll.config' DiskId='1' Source='..\RemoteService\bin\Release\RemoteServiceApi.dll.config'/>
               <File Id='TraceTeloggerLib' Name='TraceReloggerLib.dll' DiskId='1' Source='..\RemoteService\bin\Release\TraceReloggerLib.dll'/>
               <File Id='ServiceToken' Name='ServiceToken.exe' DiskId='1' Source='..\CreateServiceToken\bin\Release\ServiceToken.exe'/>
-              <!--<File Id='LicenseApi' Name='LicenseApi.dll' DiskId='1' Source='..\LicenseApi\bin\Release\LicenseApi.dll'/>-->
-              <!--<File Id='api' Name='apidsp_windows.dll' DiskId='1' Source='..\ThirdPartyFiles\apidsp_windows.dll'/>
-              <File Id='api_64' Name='apidsp_windows_x64.dll' DiskId='1' Source='..\ThirdPartyFiles\apidsp_windows_x64.dll'/>
-              <File Id='hasp' Name='hasp_windows_113740.dll' DiskId='1' Source='..\ThirdPartyFiles\hasp_windows_113740.dll'/>
-              <File Id='hasp_win' Name='hasp_windows_demo.dll' DiskId='1' Source='..\ThirdPartyFiles\hasp_windows_demo.dll'/>
-              <File Id='hasp_64' Name='hasp_windows_x64_113740.dll' DiskId='1' Source='..\ThirdPartyFiles\hasp_windows_x64_113740.dll'/>
-              <File Id='haswp_net' Name='hasp_net_windows.dll' DiskId='1' Source='..\ThirdPartyFiles\hasp_net_windows.dll'/>-->
+              
               
               <!--<?endif?>-->
               
@@ -86,20 +79,10 @@
               <ServiceControl Id='RemoteServiceControl' Name='RemoteService' Start='install' Stop='uninstall' Remove='uninstall' />
             </Component>
 
-            <!--<Component Id='RemoteServiceAPIComponent' Guid='C5C61B35-DD44-4FAD-82D5-F2084FF37B99'>
-              <?ifdef Debug ?>
-                <File Id='RemoteServiceApiGAC' Name='RemoteServiceApi.dll' Assembly='.net' KeyPath='yes' DiskId='1' Source='..\RemoteService\bin\Debug\RemoteServiceApi.dll'/>
-              <?else?>
-                <File Id='RemoteServiceApiGAC' Name='RemoteServiceApi.dll' Assembly='.net' KeyPath='yes' DiskId='1' Source='..\RemoteService\bin\Release\RemoteServiceApi.dll'/>
-              <?endif?>
-            </Component>-->     
-
           </Directory>
         </Directory>
 			</Directory>
 		</Directory>
-
- 
 
   
 
@@ -123,46 +106,23 @@
 
     
 
-    <!-- Define custom actions and corresponding custom action DLLs when required -->
-    <!--<Binary Id='api'  SourceFile='..\ThirdPartyFiles\apidsp_windows.dll' />
-    <Binary Id='api_64'  SourceFile='..\ThirdPartyFiles\apidsp_windows_x64.dll' />
-    <Binary Id='hasp'  SourceFile='..\ThirdPartyFiles\hasp_windows_113740.dll' />
-    <Binary Id='hasp_win'  SourceFile='..\ThirdPartyFiles\hasp_windows_demo.dll' />
-    <Binary Id='hasp_64'  SourceFile='..\ThirdPartyFiles\hasp_windows_x64_113740.dll' />
-    <Binary Id='haswp_net'  SourceFile='..\ThirdPartyFiles\hasp_net_windows.dll' />
-    <Binary Id='LicenseApi'  SourceFile='..\LicenseApi\bin\x86\Setup\LicenseApi.dll' />-->
+    
    
 
     <!--<?ifdef Setup ?>-->
       <Binary Id='WixCustom'  SourceFile='..\RemoteServiceInstallWixCustom\bin\x86\Setup\RemoteServiceInstallWixCustom.CA.dll' />
-    <!--<Binary Id='api'  SourceFile='..\ThirdPartyFiles\apidsp_windows.dll' />
-    <Binary Id='api_64'  SourceFile='..\ThirdPartyFiles\apidsp_windows_x64.dll' />
-    <Binary Id='hasp'  SourceFile='..\ThirdPartyFiles\hasp_windows_113740.dll' />
-    <Binary Id='hasp_win'  SourceFile='..\ThirdPartyFiles\hasp_windows_demo.dll' />
-    <Binary Id='hasp_64'  SourceFile='..\ThirdPartyFiles\hasp_windows_x64_113740.dll' />
-    <Binary Id='haswp_net'  SourceFile='..\ThirdPartyFiles\hasp_net_windows.dll' />
-    <Binary Id='LicenseApi'  SourceFile='..\LicenseApi\bin\x86\Setup\LicenseApi.dll' />-->
     
-    <!--<?else?>
-      <Binary Id='WixCustom'  SourceFile='..\RemoteServiceInstallWixCustom\bin\x64\Release\RemoteServiceInstallWixCustom.CA.dll' />-->
-   
-    <!--<?endif?>-->
 
    
     <CustomAction Id='CheckPrereq' BinaryKey='WixCustom' DllEntry='CheckPrerequisites' />
-    <!--<CustomAction Id='copyx86' BinaryKey='WixCustom' DllEntry='CopyToX86Folder' />-->
     <CustomAction Id='ChangeComputerName' BinaryKey='WixCustom' DllEntry='ChangeComputerName' />
-    <!--<CustomAction Id='WcfCommit' BinaryKey='WixCustom' DllEntry='WcfCommit' />-->
-    <!--<CustomAction Id='LaunchJumpClientInstall' FileKey='BomgarJumpClient' ExeCommand='' Return='check' />-->
+  
 
   
 
     <!-- Applying custom actions during installation -->
     <InstallExecuteSequence>
       <Custom Action='ChangeComputerName' After='StartServices'></Custom>
-      <!--<Custom Action='copyx86' After='StartServices'></Custom>-->
-      <!--<Custom Action='LaunchJumpClientInstall' After='InstallFinalize'>($BomgarJumpClientComp=3)</Custom>-->
-      <!--<Custom Action='WcfCommit' After='LaunchJumpClientInstall'>($BomgarJumpClientComp=3)</Custom>-->
      
     </InstallExecuteSequence>
 

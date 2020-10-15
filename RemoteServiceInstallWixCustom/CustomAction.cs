@@ -95,7 +95,7 @@ namespace RemoteServiceInstallWixCustom
 
                 session["HASP_INSERTED"] = "1";
                 //session.Log("Hasp OK");
-                string compName = BuildComputerName();
+                string compName = BuildComputerName(session);
                 session["COMPUTER_NAME"] = compName;
                // session.Log(string.Format("Comp Name is {0}", compName));
                 
@@ -197,6 +197,7 @@ namespace RemoteServiceInstallWixCustom
            
             string currentComputerName = Environment.GetEnvironmentVariable("COMPUTER_NAME");
             string newComputerName = session["COMPUTER_NAME"];
+            session.Log($"session COMPUTER_NAME is {newComputerName}. and current computer name is {currentComputerName}");
             if (string.IsNullOrEmpty(currentComputerName) ||
                 currentComputerName.ToLower() != newComputerName.ToLower())
             {
@@ -288,7 +289,7 @@ namespace RemoteServiceInstallWixCustom
             }
         }
 
-        private static string BuildComputerName()
+        private static string BuildComputerName(Session session = null)
         {
             try
             {
@@ -296,6 +297,7 @@ namespace RemoteServiceInstallWixCustom
                 computerName.Append(SecurityKey.PartNumber).Append(SecurityKey.SerialNumber);
                 string partNumber = SecurityKey.PartNumber.TrimEnd(new char[] { '\0' });
                 string serialNumber = SecurityKey.SerialNumber.TrimEnd(new char[] { '\0' });
+                session.Log($"computer name is {serialNumber + "_" + partNumber}");
                 return serialNumber + "_" + partNumber;
             }
             catch(Exception ex)

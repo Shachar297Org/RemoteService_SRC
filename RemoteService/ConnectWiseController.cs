@@ -99,6 +99,7 @@ namespace LumenisRemoteService
                 {
                     MONITORED_PORT = DEFAULT_PORT;
                 }
+                revokeFeature.revokeFeatureInit();
                 Logger.Information($"Monitor port is {MONITORED_PORT}");
 
                 JUMP_CLIENT_SERVICE_NAME_PREFIX = Convert.ToString(ConfigurationManager.AppSettings["MonitoredProcessName"]);//todo name should also be fetched from configuration file
@@ -211,12 +212,13 @@ namespace LumenisRemoteService
                     UpdateSessionStatus(ScreenConnectSessionStatus.SessionConnectedAndStandby, _counter,false,true);
                     
                 }
-                else
+                else //timeout
                 {
                     // there is no traffic between client and server
                     UpdateSessionStatus(ScreenConnectSessionStatus.SessionDisconnected, 1,false,false);
                     Logger.Information("closing service because of traffic inactivity. inactivity counter is {0}", _counter);
                     Close();
+                    revokeFeature.IsInTimeOut();
                 }
 
                 Logger.Debug(string.Format("traffic counter value is {0}",_counter));

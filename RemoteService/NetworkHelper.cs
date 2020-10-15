@@ -350,7 +350,7 @@ namespace LumenisRemoteService
                                 {
                                     m_Counters.Received += data.size;
                                     //System.Diagnostics.Debug.WriteLine($"recieved data size {data.size}");
-                                    //Logger.Information("received size is : {0}", m_Counters.Received.ToString());
+                                    Logger.Debug("received size is : {0}", m_Counters.Received.ToString());
                                     if (data.size != 0)
                                     {
                                         TracfficDetected(true);

@@ -37,7 +37,7 @@ namespace LumenisRemoteService
 
         public void CreateFeature(int featureId)
         {
-            Logger.Information("CreateFeature command received");
+            Logger.Information($"CreateFeature command received {featureId}");
             ServiceToken.Instance().Create(featureId);
         }
 
@@ -54,7 +54,7 @@ namespace LumenisRemoteService
        // [OperationContract]
         public void RemoveFeature(int featureId)
         {
-            Logger.Information("RemoveFeature command received");
+            Logger.Information($"RemoveFeature command received {featureId}");
             ServiceToken.Instance().Remove(featureId);
         }
 

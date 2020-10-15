@@ -30,6 +30,7 @@ namespace LumenisRemoteService
         public void Create(int featureId)
         {
             _installedFeatureDates[featureId] = DateTime.Now;
+            revokeFeature.AddFeature(featureId);
         }
 
         public bool Exists(int featureId)
@@ -53,6 +54,7 @@ namespace LumenisRemoteService
             try
             {
                 _installedFeatureDates.Remove(featureId);
+                revokeFeature.RemoveFeature(featureId);
             }
             catch
             {
