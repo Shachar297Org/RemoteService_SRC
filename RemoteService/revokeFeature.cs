@@ -22,9 +22,9 @@ namespace LumenisRemoteService
 
         private const int DEFULTFEATURE = 10001;
 
-        private const string SERVICEUSER = "ServiceUser";
+        private const string SERVICEUSER = "Service";
 
-        private const string CLINICALUSER = "ClinicUser";
+        private const string CLINICALUSER = "Clinical";
 
         private static bool _clinicUserWasUsed;
 
@@ -42,11 +42,14 @@ namespace LumenisRemoteService
         public static void revokeFeatureInit()
         {
             existingFeature.Add(DEFULTFEATURE);
+            Logger.Debug($"add default feature {DEFULTFEATURE}");
             Logger.Information($"feature {DEFULTFEATURE} is monitored");
             //form config fill featureToMonitore
             try
             {
+               
                 var result = Convert.ToString(ConfigurationManager.AppSettings["RevokeFeature"]);
+                Logger.Debug($"RevokeFeature value in config is {result}");
                 if (result != null)
                 {
                     if (result.Contains(','))//expect to more then 1 feature to monitor
@@ -68,6 +71,10 @@ namespace LumenisRemoteService
 
                                     }
                                 }
+                            }
+                            else
+                            {
+                                Logger.Debug("monitor feature list from config is  empty");
                             }
                         }
                         catch (Exception ex)
@@ -102,9 +109,12 @@ namespace LumenisRemoteService
         }
         public static void AddFeature(int p_feature)
         {
-            if(!_clinicUserWasUsed)// when first feature is injected via serviceToken we check if clinic user is active
+            Logger.Debug($"add feature {p_feature}");
+            if (!_clinicUserWasUsed)// when first feature is injected via serviceToken we check if clinic user is active
             {
+                Logger.Debug("not clinic user");
                 string userName = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
+                Logger.Debug($"user name is {userName}");
                 if (userName.Contains(CLINICALUSER))//verify that currently clinic user is in used
                 {
                     _clinicUserWasUsed = true;
@@ -113,12 +123,14 @@ namespace LumenisRemoteService
             }
             if (!featureToMonitore.Contains(p_feature))
             {
+                Logger.Debug($"feature to monitor contains {p_feature}");
                 featureToMonitore.Add(p_feature); 
             }
         }
 
         public static void RemoveFeature(int p_feature)
         {
+            Logger.Debug($"remove feature {p_feature}");
             if (p_feature == DEFULTFEATURE) return;// default feature can't be removed
             if (featureToMonitore.Contains(p_feature))
             {
@@ -133,15 +145,19 @@ namespace LumenisRemoteService
 
         public static void IsInTimeOut()
         {
+            Logger.Debug("is in time out");
             //get current user
             string userName = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
-            if(userName.Contains(SERVICEUSER))//verify that currently service user is in used
+            Logger.Debug($"user name is {userName}");
+            if (userName.Contains(SERVICEUSER))//verify that currently service user is in used
             {
+                Logger.Debug("user name is  service user");
                 if (CheckIfShouldLogOff())
                 {
-
+                    
                     if (ExitWindowsEx(0, 0))
                     {
+                        Logger.Debug("exit service account");
                         featureToMonitore.Clear();
                         _clinicUserWasUsed = true;
                         Logger.Information("log off");
@@ -168,12 +184,14 @@ namespace LumenisRemoteService
                     {
                         if (featureToMonitore.Contains(feature))
                         {
-                            return true;
+                        Logger.Debug("need to log off");
+                        return true;
                         }
                     }
                     Logger.Information("no feature was found to be monitored for logoff operation");
                     return false;// if no feature was found in featureToMonitore list
                 }
+            Logger.Debug("no need to log off. clinic user was not in used");
             return false;
             //  }
 

@@ -6,7 +6,7 @@
     <ProductVersion>3.5</ProductVersion>
     <ProjectGuid>51fd51e0-6df6-422d-8d24-9e4f78a95d5f</ProjectGuid>
     <SchemaVersion>2.0</SchemaVersion>
-    <OutputName>RemoteServiceInstall 3.0.0.0</OutputName>
+    <OutputName>RemoteServiceInstall 3.0.0.1</OutputName>
     <OutputType>Package</OutputType>
     <WixTargetsPath Condition=" '$(WixTargetsPath)' == '' AND '$(MSBuildExtensionsPath32)' != '' ">$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\Wix.targets</WixTargetsPath>
     <WixTargetsPath Condition=" '$(WixTargetsPath)' == '' ">$(MSBuildExtensionsPath)\Microsoft\WiX\v3.x\Wix.targets</WixTargetsPath>
