@@ -5,17 +5,25 @@ using System.Text;
 using System.Reflection;
 using System.IO;
 using System.Diagnostics;
+using Logging;
 
 namespace LumenisRemoteService
 {
     public class ServiceToken
     {
+        private static readonly ILogger Logger = LoggerFactory.Default.GetCurrentClassLogger();
         private readonly TimeSpan _defaultTokenLeaseTime = new TimeSpan(1, 0, 0);
         private Dictionary<int, DateTime> _installedFeatureDates = new Dictionary<int, DateTime>();
         private static ServiceToken _instance = null;
 
         private ServiceToken()
         {
+            revokeFeature._ClearAllFeatures += RevokeFeature__ClearAllFeatures;
+        }
+
+        private void RevokeFeature__ClearAllFeatures(bool obj)
+        {
+            RemoveAll();
         }
 
         public static ServiceToken Instance()
@@ -25,6 +33,12 @@ namespace LumenisRemoteService
                 _instance = new ServiceToken();
             }
             return _instance;
+        }
+
+        public void RemoveAll()
+        {
+            Logger.Debug("remove all features");
+            _installedFeatureDates.Clear();
         }
 
         public void Create(int featureId)
