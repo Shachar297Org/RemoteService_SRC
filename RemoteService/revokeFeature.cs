@@ -424,6 +424,7 @@ namespace LumenisRemoteService
 
         public static void IsInTimeOut()
         {
+            return;
             Logger.Debug("is in time out");
             //get current user
             string userName = GetUserName();
