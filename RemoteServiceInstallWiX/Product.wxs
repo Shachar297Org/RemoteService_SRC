@@ -6,7 +6,7 @@
     <?define installationType="" ?>
   <?endif ?>
   
-	<Product Id="D57D8A24-1DD2-41FC-9DAA-4100CEADE80E" Name="Lumenis Remote Service $(var.installationType) v3.0.1" Language="1033" Version="3.0.1" Manufacturer="Lumenis Ltd."
+	<Product Id="D57D8A24-1DD2-41FC-9DAA-4100CEADE80E" Name="Lumenis Remote Service $(var.installationType) v3.0.2" Language="1033" Version="3.0.2" Manufacturer="Lumenis Ltd."
            UpgradeCode="02E714BA-392F-43D1-B585-315455582A90">
 
     <Package Id="*" Description="Lumenis Remote Service Installer" InstallerVersion="200" Compressed="yes" />

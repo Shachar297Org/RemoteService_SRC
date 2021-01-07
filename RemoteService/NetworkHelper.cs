@@ -306,7 +306,7 @@ namespace LumenisRemoteService
             Task.Run(() => StartEtwSession());
         }
 
-        
+       
         private void StartEtwSession()
         {
             try
@@ -335,13 +335,17 @@ namespace LumenisRemoteService
                 Logger.Information(string.Format("event session name is {0}", eventSessionName));
                 using (m_EtwSession = new TraceEventSession(eventSessionName))
                 {
-
-
                     try
                     {
                         m_EtwSession.EnableKernelProvider(KernelTraceEventParser.Keywords.NetworkTCPIP, KernelTraceEventParser.Keywords.None);
-
-
+                        m_EtwSession.Source.Kernel.TcpIpDisconnect += state =>
+                        {
+                            if (state.ProcessID == processId)
+                            {
+                                Disconnected(true);//? maybe there are normal and valid scenario where 0 bytes are sent
+                            }
+                        };
+                     
                         m_EtwSession.Source.Kernel.TcpIpRecv += data =>
                         {
                             if (data.ProcessID == processId)
@@ -358,7 +362,6 @@ namespace LumenisRemoteService
                                     else
                                     {
                                         TracfficDetected(false);
-                                        Disconnected(true);//? maybe there are normal and valid scenario where 0 bytes are sent
                                         Logger.Information("received zero bytes. single of portal disconnection");
                                     }
                                 }
